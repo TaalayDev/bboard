@@ -1,0 +1,122 @@
+{
+  "project_info": {
+    "project_number": "74950354939",
+    "firebase_url": "https://luckychat-286b1.firebaseio.com",
+    "project_id": "luckychat-286b1",
+    "storage_bucket": "luckychat-286b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74950354939:android:0c11c6c1639207b6eecd5e",
+        "android_client_info": {
+          "package_name": "kg.chips.luckychat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74950354939-3ldddvq6d0b7leiqe9j07usqkl4ehlc0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kg.chips.luckychat",
+            "certificate_hash": "d6b54337a36f07120add442c60ae62eb5b72e6a0"
+          }
+        },
+        {
+          "client_id": "74950354939-7cnnkm1rs89j1t5lt2gk0ei95e4rcvaj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kg.chips.luckychat",
+            "certificate_hash": "f673c7e5d94ddf6c3ea65fe336cd4d9aeb975284"
+          }
+        },
+        {
+          "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCceqVTtrw88Bvh2IXWehA8XxaFW2YticA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74950354939:android:c9ad810671fdf898",
+        "android_client_info": {
+          "package_name": "kg.programm.randomchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74950354939-16hamkcathppcmsisf5uqqgav9ke3cvu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kg.programm.randomchat",
+            "certificate_hash": "213976ee61e76ff23912c7ede6eef45a3a42e79f"
+          }
+        },
+        {
+          "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCceqVTtrw88Bvh2IXWehA8XxaFW2YticA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74950354939:android:abcb54d9faeacf0aeecd5e",
+        "android_client_info": {
+          "package_name": "ru.bboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCceqVTtrw88Bvh2IXWehA8XxaFW2YticA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74950354939-ha9eubhcrusm05sg9r1ro8jujvh8mfqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
