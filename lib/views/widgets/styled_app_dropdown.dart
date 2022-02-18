@@ -45,10 +45,11 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
 
   @override
   void didUpdateWidget(covariant StyledAppDropDown<T> oldWidget) {
-    if (widget.value != oldWidget.value)
+    if (widget.value != oldWidget.value) {
       setState(() {
         _selectedItem = widget.value;
       });
+    }
     super.didUpdateWidget(oldWidget);
   }
 

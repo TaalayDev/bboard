@@ -1,92 +1,123 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:bboard/helpers/helper.dart';
+import 'package:bboard/models/currency.dart';
+import 'package:bboard/models/region.dart';
+import 'package:bboard/tools/app_router.dart';
+import 'package:bboard/tools/locale_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../../models/category.dart';
+import '../../../models/city.dart';
+import '../../../models/custom_attribute.dart';
+import '../../../models/district.dart';
 import '../../../resources/theme.dart';
-import '../../widgets/styled_app_dropdown.dart';
+import '../app_button.dart';
 import '../app_network_image.dart';
 import '../custom_card.dart';
+import '../custom_select.dart';
+import '../form_builder.dart';
 
 class ProductFields extends StatelessWidget {
   const ProductFields({
     Key? key,
+    required this.formController,
+    required this.category,
     this.images = const [],
+    this.currencies = const [],
+    this.regions = const [],
+    this.loadingCategory = false,
+    this.isSending = false,
     this.onPickImagesTap,
+    this.onRemoveImage,
+    this.onCategoryTap,
+    this.onSendTap,
   }) : super(key: key);
 
-  final List<Asset> images;
+  final FormBuilderController formController;
+  final bool loadingCategory;
+  final bool isSending;
+  final Category? category;
+  final List<File> images;
+  final List<Currency> currencies;
+  final List<Region> regions;
   final Function()? onPickImagesTap;
+  final Function(int index)? onRemoveImage;
+  final Function()? onCategoryTap;
+  final Function(Map<String, dynamic> params)? onSendTap;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          const _Title(text: 'Фотографии'),
-          CustomCard(
-            child: ImagesGrid(
-              images: images,
-              onTap: onPickImagesTap,
-            ),
-          ),
-          const SizedBox(height: 20),
-          const _Title(text: 'Категория *'),
-          CustomCard(
-            padding: EdgeInsets.zero,
-            child: ListTile(
-              leading: const Icon(Feather.settings),
-              title: const Text('Услуги > Красота и здоровье'),
-              subtitle: Text(
-                'Нарашивание ресниц',
-                style: TextStyle(
-                  color: Theme.of(context).primary,
-                  fontSize: 16,
-                ),
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-            ),
-          ),
-          const SizedBox(height: 30),
-          const _Title(text: 'Загаловок *'),
-          CustomCard(
-            padding: EdgeInsets.zero,
-            child: TextFormField(
-              maxLength: 100,
-              decoration: const InputDecoration(
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                counterText: '',
-              ),
-            ),
-          ),
-          const SizedBox(height: 30),
-          const _Title(text: 'Описание *'),
-          CustomCard(
-            padding: EdgeInsets.zero,
-            child: TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Подробно опишите свой товар или услугу. '
-                    'Напишите про хараутеристики, особенности и сосьояние',
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                counterText: '',
-              ),
-              maxLines: 5,
-              maxLength: 550,
-            ),
-          ),
-          const SizedBox(height: 30),
-          const _Title(text: 'Цена'),
-          CustomCard(
-            padding: EdgeInsets.zero,
-            child: Row(
+      child: FormBuilder(
+          controller: formController,
+          builder: (context) {
+            final category = this.category;
+            final region = formController.getValue<Region>('region');
+            final city = formController.getValue<City>('city');
+            final phones = formController.getValue<List<String>>('phones');
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
+                const SizedBox(height: 20),
+                const _Title(text: 'Фотографии'),
+                CustomCard(
+                  child: ImagesGrid(
+                    images: images,
+                    onTap: onPickImagesTap,
+                    onRemove: onRemoveImage,
+                  ),
+                ),
+                if (category != null) ...[
+                  const SizedBox(height: 20),
+                  const _Title(text: 'Категория *'),
+                  CustomCard(
+                    padding: EdgeInsets.zero,
+                    child: ListTile(
+                      onTap: onCategoryTap,
+                      leading: const Icon(Feather.settings),
+                      title: loadingCategory
+                          ? Shimmer.fromColors(
+                              child: const Text('Загрузка категорий...'),
+                              baseColor: Colors.white,
+                              highlightColor: Colors.grey,
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (category.parent != null)
+                                  Text(getParentsTree(category.parent!))
+                                      .paddingOnly(bottom: 3),
+                                Text(
+                                  category.name,
+                                  style: TextStyle(
+                                    color: Theme.of(context).primary,
+                                    fontSize: 16,
+                                  ),
+                                )
+                              ],
+                            ),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 30),
+                const _Title(text: 'Загаловок *'),
+                CustomCard(
+                  padding: EdgeInsets.zero,
                   child: TextFormField(
                     maxLength: 100,
+                    initialValue: formController.getValue('title'),
+                    onChanged: (value) {
+                      formController.setValue('title', value);
+                    },
                     decoration: const InputDecoration(
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -94,19 +125,312 @@ class ProductFields extends StatelessWidget {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: StyledAppDropDown(
-                    list: ['сом', '\$'],
-                    displayItem: (item) => item.toString(),
+                const SizedBox(height: 30),
+                const _Title(text: 'Описание *'),
+                CustomCard(
+                  padding: EdgeInsets.zero,
+                  child: TextFormField(
+                    initialValue: formController.getValue('description'),
+                    onChanged: (value) {
+                      formController.setValue('description', value);
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Подробно опишите свой товар или услугу. '
+                          'Напишите про характеристики, особенности и состояние',
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      counterText: '',
+                    ),
+                    maxLines: 5,
+                    maxLength: 550,
                   ),
                 ),
+                const SizedBox(height: 30),
+                const _Title(text: 'Цена *'),
+                CustomCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        maxLength: 100,
+                        keyboardType: TextInputType.number,
+                        initialValue: formController.getValue('price'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (value) {
+                          formController.setValue('price', value);
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'Цена',
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          counterText: '',
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: CustomSelect<Currency>(
+                          title: 'Валюта ',
+                          list: currencies,
+                          value: formController.getValue('currency_id'),
+                          onChanged: (value) {
+                            formController.setValue('currency_id', value);
+                          },
+                          valueItem: (item) => item.id,
+                          displayItem: (item) => item.symbol,
+                        ),
+                      ),
+                      const Divider(height: 0),
+                      ListTile(
+                        contentPadding:
+                            const EdgeInsets.only(left: 25, right: 15),
+                        title: const Text('Договорная'),
+                        trailing: Switch.adaptive(
+                          value: formController.getValue('negotiable') ?? false,
+                          onChanged: (value) {
+                            formController.setValue('negotiable', value);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (category?.customAttributes != null &&
+                    category!.customAttributes.isNotEmpty) ...[
+                  const SizedBox(height: 30),
+                  const _Title(text: 'Дополнительные параметры'),
+                  CustomCard(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      children: category.customAttributes.map((e) {
+                        if (e.type == CustomAttributeType.STRING ||
+                            e.type == CustomAttributeType.TEXT) {
+                          return TextFormField(
+                            maxLength: 100,
+                            initialValue: formController.getValue(e.name),
+                            onChanged: (value) {
+                              formController.setValue(e.name, value);
+                            },
+                            decoration: InputDecoration(
+                              hintText: e.title,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              counterText: '',
+                            ),
+                          );
+                        }
+
+                        if (e.type == CustomAttributeType.SELECT ||
+                            e.type == CustomAttributeType.MULTISELECT) {
+                          var values = jsonDecode(e.values ?? '');
+                          if (values is Map) {
+                            values = values.values.map((e) => e).toList();
+                          }
+
+                          return CustomSelect(
+                            list:
+                                values != null && values is List ? values : [],
+                            displayItem: (value) => value.toString(),
+                            value: formController.getValue(e.name),
+                            onChanged: (value) {
+                              formController.setValue(e.name, value);
+                            },
+                            title: e.title,
+                            multiple: e.type == CustomAttributeType.MULTISELECT,
+                          );
+                        }
+
+                        if (e.type == CustomAttributeType.INT ||
+                            e.type == CustomAttributeType.DOUBLE) {
+                          return TextFormField(
+                            maxLength: 100,
+                            keyboardType: TextInputType.number,
+                            initialValue: formController.getValue(e.name),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            onChanged: (value) {
+                              formController.setValue(e.name, value);
+                            },
+                            decoration: InputDecoration(
+                              hintText: e.title,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              counterText: '',
+                            ),
+                          );
+                        }
+
+                        if (e.type == CustomAttributeType.BOOLEAN) {
+                          return ListTile(
+                            contentPadding:
+                                const EdgeInsets.only(left: 25, right: 15),
+                            title: Text(e.title),
+                            trailing: Switch.adaptive(
+                              value: formController.getValue(e.name) ?? false,
+                              onChanged: (value) {
+                                formController.setValue(e.name, value);
+                              },
+                            ),
+                          );
+                        }
+
+                        return Text(e.title);
+                      }).toList(),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 30),
+                const _Title(text: 'Видео'),
+                CustomCard(
+                  padding: EdgeInsets.zero,
+                  child: TextFormField(
+                    maxLength: 100,
+                    initialValue: formController.getValue('video_url'),
+                    onChanged: (value) {
+                      formController.setValue('video_url', value);
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Ссылка на YouTube',
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      counterText: '',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                const _Title(text: 'Расположение *'),
+                CustomCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      CustomSelect<Region>(
+                        list: regions,
+                        displayItem: (value) => value.name,
+                        valueItem: (value) => value,
+                        value: formController.getValue('region'),
+                        onChanged: (value) {
+                          formController.setValue('region', value);
+                        },
+                        title: 'Регион',
+                      ),
+                      CustomSelect<City>(
+                        list: region?.cities ?? [],
+                        displayItem: (value) => value.name,
+                        valueItem: (value) => value,
+                        value: formController.getValue('city'),
+                        onChanged: (value) {
+                          formController.setValue('city', value);
+                        },
+                        title: 'Город',
+                      ),
+                      CustomSelect<District>(
+                        list: city?.districts ?? [],
+                        displayItem: (value) => value.name,
+                        valueItem: (value) => value.name,
+                        value: formController.getValue('district'),
+                        onChanged: (value) {
+                          formController.setValue('district', value);
+                        },
+                        title: 'Район',
+                      ),
+                    ],
+                  ),
+                ),
+                if (phones != null) ...[
+                  const SizedBox(height: 30),
+                  const _Title(text: 'Телефон *'),
+                  CustomCard(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...phones.asMap().entries.map((item) {
+                          return ListTile(
+                            title: Text('+${item.value}'),
+                            trailing: item.key != 0
+                                ? TextButton(
+                                    onPressed: () {
+                                      phones.remove(item.value);
+                                      formController.setValue('phones', phones);
+                                    },
+                                    child: Icon(
+                                      Icons.delete_outline,
+                                      size: 18,
+                                      color: context.theme.accent,
+                                    ),
+                                  )
+                                : null,
+                          );
+                        }).toList(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TextButton(
+                            onPressed: () async {
+                              final phone =
+                                  await Get.toNamed(AppRouter.addPhone);
+                              if (phone != null && !phones.contains(phone)) {
+                                phones.add(phone);
+                                formController.setValue('phones', phones);
+                              }
+                            },
+                            child: const Text('Добавить телефон'),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: AppButton(
+                    text: 'Подать объявление',
+                    loading: isSending,
+                    onPressed: () {
+                      final values = {...formController.getValues()};
+                      final requiredKeys = [
+                        'title',
+                        'description',
+                        'category_id',
+                        'region',
+                        'city'
+                      ];
+                      bool hasErrors = false;
+                      for (final key in requiredKeys) {
+                        if (!values.containsKey(key)) {
+                          hasErrors = true;
+                          formController.seError(key, 'Это поле обязательна');
+                        }
+                      }
+                      if (hasErrors) {
+                        Get.snackbar('app_title'.tr,
+                            'Вы не заполнили все обязательные поля');
+                        return;
+                      }
+                      values['region_id'] = values['region'].id;
+                      values.remove('region');
+                      values['city_id'] = values['city'].id;
+                      values.remove('city');
+
+                      onSendTap?.call(values);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 100),
               ],
-            ),
-          ),
-          const SizedBox(height: 100),
-        ],
-      ),
+            );
+          }),
     );
+  }
+
+  String getParentsTree(Category category) {
+    return (category.parent != null
+            ? getParentsTree(category.parent!) + ' > '
+            : '') +
+        category.name;
   }
 }
 
@@ -200,11 +524,12 @@ class ImagesGrid extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: isAsset
-                            ? AssetThumb(
-                                asset: images[index - 1],
-                                height: 500,
-                                width: 500,
-                              )
+                            ? images[index - 1] != null
+                                ? Image.file(
+                                    images[index - 1],
+                                    fit: BoxFit.cover,
+                                  )
+                                : SizedBox()
                             : AppNetworkImage(
                                 imageUrl: images[index - 1].image,
                               ),
@@ -216,7 +541,7 @@ class ImagesGrid extends StatelessWidget {
                             right: -10,
                             child: IconButton(
                               onPressed: () {
-                                onRemove?.call(index);
+                                onRemove?.call(index - 1);
                               },
                               icon: Container(
                                 height: 20,

@@ -25,15 +25,22 @@ Future<void> main() async {
   await LocaleStorage.init();
   // await Jiffy.locale('ru');
   try {
-    await Firebase.initializeApp();
-    PushNotificationsManager().init();
+    if (Platform.isAndroid || Platform.isIOS) {
+      await Firebase.initializeApp();
+      PushNotificationsManager().init();
+    }
+
+    if (Platform.isAndroid) {
+      await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
   } catch (e) {}
 
-  if (Platform.isAndroid) {
-    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-  }
-
-  runApp(const App());
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {

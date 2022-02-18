@@ -1,11 +1,13 @@
-import 'package:bboard/tools/image_picker.dart';
+import 'dart:io';
+
+import 'package:bboard/tools/app_router.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:get/get.dart';
-import 'package:multi_image_picker2/multi_image_picker2.dart';
 
-import '../repositories/user_repo.dart';
-import '../tools/locale_storage.dart';
 import '../models/user.dart';
+import '../repositories/user_repo.dart';
+import '../tools/image_picker.dart';
+import '../tools/locale_storage.dart';
 
 class UserController extends GetxController {
   bool loading = false;
@@ -18,7 +20,7 @@ class UserController extends GetxController {
 
   String? smsCode;
 
-  Asset? image;
+  File? image;
 
   String? _verificationId;
 
@@ -27,8 +29,6 @@ class UserController extends GetxController {
   String? _name;
   String? _uuid;
   int? _forceResendingToken;
-
-  final _firebaseAuth = FirebaseAuth.instance;
 
   set phone(String? newVal) {
     _phone = newVal;
@@ -62,9 +62,17 @@ class UserController extends GetxController {
   final _userRepo = Get.find<UserRepo>();
 
   Future<void> pickImage() async {
-    final result = await ImagePicker.pickImages([], maxImages: 1);
+    final result = await ImagePicker.pickImages(multiple: false);
     image = result.isNotEmpty ? result[0] : null;
     update();
+  }
+
+  Future<void> pickCameraImage() async {
+    final result = await ImagePicker.pickImageFromCamera();
+    if (result != null) {
+      image = result;
+      update();
+    }
   }
 
   Future<void> logIn({
@@ -103,6 +111,9 @@ class UserController extends GetxController {
     if (response.status && response.data != null) {
       LocaleStorage.currentUser = response.data;
       update();
+    } else if (response.message == 'Unauthorized') {
+      LocaleStorage.token = null;
+      Get.toNamed(AppRouter.login);
     }
   }
 
@@ -113,7 +124,7 @@ class UserController extends GetxController {
       timerRunning = true;
       update();
 
-      await _firebaseAuth.verifyPhoneNumber(
+      await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: '+' + _phone!.removeAllWhitespace,
         forceResendingToken: _forceResendingToken,
         timeout: const Duration(seconds: 60),
@@ -150,7 +161,7 @@ class UserController extends GetxController {
             verificationId: _verificationId!, smsCode: smsCode!);
 
         final userCredential =
-            await _firebaseAuth.signInWithCredential(credential);
+            await FirebaseAuth.instance.signInWithCredential(credential);
         _uuid = userCredential.user?.uid;
         _phone = userCredential.user?.phoneNumber;
 

@@ -11,6 +11,7 @@ class AppNetworkImage extends StatelessWidget {
   final double? height;
   final double? width;
   final Widget? errorWidget;
+  final bool showProgress;
 
   const AppNetworkImage({
     key,
@@ -19,6 +20,7 @@ class AppNetworkImage extends StatelessWidget {
     this.height,
     this.width,
     this.errorWidget,
+    this.showProgress = false,
   }) : super(key: key);
 
   @override
@@ -34,19 +36,21 @@ class AppNetworkImage extends StatelessWidget {
             Assets.icon,
             fit: BoxFit.fill,
           ),
-      progressIndicatorBuilder: (context, url, progress) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: CircularProgressIndicator(
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(context.theme.primary),
-                value: progress.totalSize != null
-                    ? progress.downloaded / progress.totalSize!
-                    : null),
-          ),
-        );
-      },
+      progressIndicatorBuilder: showProgress
+          ? (context, url, progress) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(context.theme.primary),
+                      value: progress.totalSize != null
+                          ? progress.downloaded / progress.totalSize!
+                          : null),
+                ),
+              );
+            }
+          : null,
     );
   }
 }

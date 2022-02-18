@@ -56,6 +56,14 @@ class LocaleStorage {
   static _put(String name, val) => Hive.box(_defaultBox).put(name, val);
   static T? _get<T>(String name) => Hive.box(_defaultBox).get(name) as T;
 
+  static listenToken(Function() listener) {
+    Hive.box(_defaultBox).listenable(keys: ['token']).addListener(listener);
+  }
+
+  static removeTokenListener(Function() listener) {
+    Hive.box(_defaultBox).listenable(keys: ['token']).removeListener(listener);
+  }
+
   static listenUser(Function() listener) {
     Hive.box(_defaultBox)
         .listenable(keys: ['current_user']).addListener(listener);

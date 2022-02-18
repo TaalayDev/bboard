@@ -5,6 +5,7 @@ class Category {
   final int id;
   final String name;
   int? parentId;
+  Category? parent;
   Media? media;
   final List<Category> children;
   final List<CustomAttribute> customAttributes;
@@ -13,6 +14,7 @@ class Category {
     required this.id,
     required this.name,
     this.parentId,
+    this.parent,
     this.media,
     this.children = const [],
     this.customAttributes = const [],
@@ -22,6 +24,7 @@ class Category {
         id: map['id'],
         name: map['name'],
         parentId: map['parent_id'],
+        parent: map['parent'] != null ? Category.fromMap(map['parent']) : null,
         media:
             (map['has_media'] ?? false) ? Media.fromMap(map['media'][0]) : null,
         children: fromList(map['children'] ?? const []),

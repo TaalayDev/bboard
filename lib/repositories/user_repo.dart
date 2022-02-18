@@ -44,9 +44,15 @@ class UserRepo extends BaseRepo {
     var model = AppResponse<User>();
     try {
       final response = await get('user', params: params);
-      if (isOk(response)) {
-        model.data = User.fromMap(response.data['data']);
+      if (isOk(response) && response.data is Map) {
+        model.data = response.data?['data'] != null
+            ? User.fromMap(response.data['data'])
+            : null;
         model.status = true;
+      } else {
+        if (response.statusCode == 401) {
+          model.message = 'Unauthorized';
+        }
       }
     } on DioError catch (e) {
       model.message = e.message;

@@ -1,4 +1,5 @@
 import 'package:bboard/models/category.dart';
+import 'package:bboard/views/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,15 +33,36 @@ class SelectCategoryPage extends StatelessWidget {
             ),
             body: Padding(
               padding: const EdgeInsets.symmetric(vertical: 15),
-              child: CategoryList(
-                list: controller.showingCategories,
-                onTap: (index, category) {
-                  if (category.children.isEmpty) {
-                    Get.back(result: category);
-                  }
+              child: Stack(
+                children: [
+                  CategoryList(
+                    list: controller.showingCategories,
+                    onTap: (index, category) {
+                      if (category.children.isEmpty) {
+                        Get.back(result: category);
+                      }
 
-                  controller.selectCategory(category);
-                },
+                      controller.selectCategory(category);
+                    },
+                  ),
+                  controller.selectedCategory != null
+                      ? Positioned(
+                          bottom: 10,
+                          left: 0,
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: AppButton(
+                              text: 'Выбрать '
+                                  '${controller.selectedCategory?.name}',
+                              onPressed: () {
+                                Get.back(result: controller.selectedCategory);
+                              },
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
+                ],
               ),
             ),
           ),
@@ -88,7 +110,12 @@ class CategoryList extends StatelessWidget {
           leading: category.parentId != null
               ? null
               : category.media?.originalUrl != null
-                  ? AppNetworkImage(imageUrl: category.media!.originalUrl!)
+                  ? Container(
+                      constraints: const BoxConstraints(maxWidth: 40),
+                      child: AppNetworkImage(
+                        imageUrl: category.media!.originalUrl!,
+                      ),
+                    )
                   : const CircleAvatar(child: AppImage(Assets.icon)),
           title: Text(category.name),
           trailing: category.children.isEmpty

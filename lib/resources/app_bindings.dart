@@ -1,3 +1,4 @@
+import 'package:bboard/repositories/settings_repo.dart';
 import 'package:get/get.dart';
 
 import '../controllers/category_controller.dart';
@@ -14,6 +15,7 @@ class AppBindings implements Bindings {
     Get.put(ProductRepo());
     Get.put(CategoryRepo());
     Get.put(UserRepo());
+    Get.put(SettingsRepo());
 
     // controllers
     Get.put(CategoryController());

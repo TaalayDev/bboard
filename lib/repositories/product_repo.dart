@@ -64,4 +64,22 @@ class ProductRepo extends BaseRepo {
 
     return model;
   }
+
+  Future<AppResponse<Product>> createProduct(Map<String, dynamic>? data) async {
+    var model = AppResponse<Product>();
+    try {
+      final response =
+          await post('products', data: FormData.fromMap(data ?? {}));
+      if (isOk(response)) {
+        model = AppResponse.fromMap(response.data);
+        model.data = Product.fromMap(response.data['data']);
+      }
+    } on DioError catch (e) {
+      print('error ${e.response?.data} ${e.message}');
+      model.message = e.message;
+      model.errorData = e.response?.data;
+    }
+
+    return model;
+  }
 }

@@ -45,5 +45,9 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Разрешить загружать фото с галереи?</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Разрешить приложению снимать и загружать фото с камеры?</string>
 	</dict>
 </plist>

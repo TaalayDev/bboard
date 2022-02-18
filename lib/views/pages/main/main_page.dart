@@ -1,3 +1,5 @@
+import 'package:bboard/controllers/category_controller.dart';
+import 'package:bboard/controllers/product_controller.dart';
 import 'package:bboard/tools/app_router.dart';
 import 'package:bboard/tools/locale_storage.dart';
 import 'package:bboard/views/pages/auth/login_page.dart';
@@ -7,6 +9,7 @@ import 'package:bboard/views/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../models/category.dart';
 import '../../widgets/bottom_navigation.dart';
 
 class MainPage extends StatefulWidget {
@@ -47,10 +50,15 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: BottomNavigation(
         currentTab: currentIndex,
         onTap: (index) async {
+          if (!LocaleStorage.isLogin && index > 0) {
+            Get.toNamed(AppRouter.login);
+          }
+
           if (index == 2) {
             final category = await Get.toNamed(AppRouter.selectCategory);
             if (category != null) {
-              Get.toNamed(AppRouter.createProduct, arguments: category);
+              Get.find<ProductController>().selectedCategory = category;
+              Get.toNamed(AppRouter.createProduct);
             }
 
             return;
@@ -59,6 +67,7 @@ class _MainPageState extends State<MainPage> {
           setState(() {
             currentIndex = index;
           });
+
           _pageController.animateToPage(index,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOut);

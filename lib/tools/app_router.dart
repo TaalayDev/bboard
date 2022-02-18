@@ -1,3 +1,4 @@
+import 'package:bboard/views/pages/add_phone/add_phone_page.dart';
 import 'package:bboard/views/pages/auth/login_page.dart';
 import 'package:bboard/views/pages/auth/register_page.dart';
 import 'package:bboard/views/pages/auth/verify_phone_page.dart';
@@ -59,6 +60,7 @@ class AppRouter {
       '/residential_complex_details';
   static const String developers = '/developers';
   static const String developerDetails = '/developer_details';
+  static const String addPhone = '/add_phone';
 
   static String get initialRoute => splash;
 
@@ -72,6 +74,7 @@ class AppRouter {
     GetPage(name: verifyCode, page: () => const VerifyPhonePage()),
     GetPage(name: settings, page: () => const SettingsPage()),
     GetPage(name: selectCategory, page: () => const SelectCategoryPage()),
-    GetPage(name: createProduct, page: () => const CreateProductPage()),
+    GetPage(name: createProduct, page: () => CreateProductPage()),
+    GetPage(name: addPhone, page: () => AddPhonePage()),
   ];
 }

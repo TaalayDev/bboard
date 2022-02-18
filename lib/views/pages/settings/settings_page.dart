@@ -1,7 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
-import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 import '../../../controllers/user_controller.dart';
 import '../../../resources/theme.dart';
@@ -37,7 +39,7 @@ class SettingsPage extends StatelessWidget {
                         alignment: Alignment.bottomCenter,
                         children: [
                           InkWell(
-                            onTap: () => controller.pickImage(),
+                            onTap: () => selectPickerSource(controller),
                             child: const _Avatar(),
                           ),
                           Positioned(
@@ -83,6 +85,39 @@ class SettingsPage extends StatelessWidget {
       }),
     );
   }
+
+  void selectPickerSource(UserController controller) {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
+      controller.pickImage();
+      return;
+    }
+
+    Get.bottomSheet(
+      Material(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Feather.image),
+              title: Text('Галерея'),
+              onTap: () async {
+                Get.back();
+                controller.pickImage();
+              },
+            ),
+            ListTile(
+              leading: Icon(Feather.camera),
+              title: Text('Камера'),
+              onTap: () async {
+                Get.back();
+                controller.pickCameraImage();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _Avatar extends StatelessWidget {
@@ -93,13 +128,30 @@ class _Avatar extends StatelessWidget {
     return GetBuilder<UserController>(
       builder: (controller) {
         if (controller.image != null) {
+          if (kIsWeb) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: controller.image != null
+                  ? Image.network(
+                      controller.image!.path,
+                      height: 200,
+                      width: 200,
+                      fit: BoxFit.cover,
+                    )
+                  : const SizedBox(),
+            );
+          }
+
           return ClipRRect(
             borderRadius: BorderRadius.circular(50),
-            child: AssetThumb(
-              asset: controller.image!,
-              height: 200,
-              width: 200,
-            ),
+            child: controller.image != null
+                ? Image.file(
+                    controller.image!,
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  )
+                : const SizedBox(),
           );
         }
 
