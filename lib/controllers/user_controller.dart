@@ -1,11 +1,14 @@
 import 'dart:io';
 
-import 'package:bboard/tools/app_router.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
+import 'package:path/path.dart';
 
 import '../models/user.dart';
+import '../models/user_products_count.dart';
 import '../repositories/user_repo.dart';
+import '../tools/app_router.dart';
 import '../tools/image_picker.dart';
 import '../tools/locale_storage.dart';
 
@@ -13,7 +16,9 @@ class UserController extends GetxController {
   bool loading = false;
   bool codeSent = false;
   bool timerRunning = false;
+  bool loadingProductsCount = false;
 
+  UserProductsCount? productsCount;
   String? passwordError;
   String? phoneError;
   String? nameError;
@@ -61,9 +66,16 @@ class UserController extends GetxController {
 
   final _userRepo = Get.find<UserRepo>();
 
+  @override
+  void onInit() {
+    fetchUser();
+    super.onInit();
+  }
+
   Future<void> pickImage() async {
     final result = await ImagePicker.pickImages(multiple: false);
     image = result.isNotEmpty ? result[0] : null;
+    updateUser();
     update();
   }
 
@@ -71,6 +83,7 @@ class UserController extends GetxController {
     final result = await ImagePicker.pickImageFromCamera();
     if (result != null) {
       image = result;
+      updateUser();
       update();
     }
   }
@@ -111,14 +124,43 @@ class UserController extends GetxController {
     if (response.status && response.data != null) {
       LocaleStorage.currentUser = response.data;
       update();
-    } else if (response.message == 'Unauthorized') {
-      LocaleStorage.token = null;
-      Get.toNamed(AppRouter.login);
+    } else {
+      print('user error ${response.errorData}');
     }
   }
 
+  Future<void> updateUser({String? name, Function()? onSuccess}) async {
+    final data = <String, dynamic>{
+      '_method': 'PATCH',
+      if (image != null)
+        'avatar': MultipartFile.fromBytes(
+          await image!.readAsBytes(),
+          filename: basename(image!.path),
+        ),
+      if (name != null && name.isNotEmpty) 'name': name,
+    };
+    final response = await _userRepo.updateUser(FormData.fromMap(data));
+    if (response.status) {
+      LocaleStorage.currentUser = response.data;
+      onSuccess?.call();
+    }
+    update();
+  }
+
+  Future<void> fetchUserProductsCount() async {
+    loadingProductsCount = true;
+    update();
+
+    final responseModel = await _userRepo.fetchUserProductsCount();
+    if (responseModel.status) {
+      productsCount = responseModel.data;
+    }
+
+    loadingProductsCount = false;
+    update();
+  }
+
   void sendPhoneConfirmation() async {
-    print('send phone confirmation $_phone');
     if (_phone != null) {
       loading = true;
       timerRunning = true;

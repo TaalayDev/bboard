@@ -8,11 +8,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     Key? key,
     required this.title,
     this.backIcon,
+    this.actions,
     this.onBackPressed,
   }) : super(key: key);
 
   final String title;
   final Widget? backIcon;
+  final List<Widget>? actions;
   final Function()? onBackPressed;
 
   @override
@@ -35,6 +37,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
+      actions: actions,
     );
   }
 

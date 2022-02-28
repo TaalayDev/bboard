@@ -1,59 +1,47 @@
 import 'package:bboard/tools/app_router.dart';
+import 'package:bboard/views/widgets/custom_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/category_controller.dart';
 import '../../../controllers/product_controller.dart';
 import '../../widgets/product/sliver_products_grid.dart';
-import '../../../resources/theme.dart';
 import '../../widgets/category/category_slider.dart';
 import '../../widgets/loading_more_widget.dart';
-import '../../widgets/bottom_navigation.dart';
-import 'home_page_controller.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+
+  final TextEditingController searchFieldController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        elevation: 0.0,
-        title: SizedBox(
-          height: 40,
-          child: TextField(
-            decoration: InputDecoration(
-              fillColor: AppTheme.theme.onPrimaryColor,
-              filled: true,
-              prefixIcon: const Icon(Feather.search),
-              hintText: 'Я ищу...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Feather.search, size: 30),
-          ),
-          const SizedBox(width: 15),
-        ],
+      appBar: CustomSearchBar(
+        textController: searchFieldController,
+        onSearchPressed: () {
+          Get.find<ProductController>()
+              .fetchProducts(search: searchFieldController.text);
+        },
+        onStopEditingSearchText: (value) {
+          if (value.isEmpty) {
+            Get.find<ProductController>().fetchProducts();
+          }
+        },
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await Get.find<ProductController>().fetchProducts();
+          await Get.find<ProductController>()
+              .fetchProducts(search: searchFieldController.text);
         },
         child: NotificationListener<ScrollNotification>(
           onNotification: (scrollInfo) {
             if (scrollInfo.metrics.pixels ==
                 scrollInfo.metrics.maxScrollExtent) {
-              Get.find<ProductController>().fetchMoreProducts();
+              Get.find<ProductController>()
+                  .fetchMoreProducts(search: searchFieldController.text);
             }
+
             return false;
           },
           child: CustomScrollView(
@@ -65,6 +53,12 @@ class HomePage extends StatelessWidget {
                   builder: (controller) => CategorySlider(
                     horizontalPadding: 20,
                     list: controller.categoryTree,
+                    onTap: (category) {
+                      Get.toNamed(
+                        AppRouter.categoryProducts,
+                        arguments: category,
+                      );
+                    },
                   ),
                 ),
               ),

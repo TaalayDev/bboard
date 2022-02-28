@@ -1,20 +1,35 @@
-import 'package:bboard/controllers/product_controller.dart';
-import 'package:bboard/views/widgets/app_icon.dart';
-import 'package:bboard/views/widgets/product/sliver_products_grid.dart';
+import 'package:bboard/views/pages/product_details/product_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 
+import '../../../controllers/product_controller.dart';
 import '../../../resources/theme.dart';
+import '../../widgets/product/sliver_products_grid.dart';
 
-class FavoritesPage extends StatelessWidget {
+class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key}) : super(key: key);
+
+  @override
+  State<FavoritesPage> createState() => _FavoritesPageState();
+}
+
+class _FavoritesPageState extends State<FavoritesPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      Get.find<ProductController>().fetchFavorites();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        centerTitle: true,
         title: Text(
           'favorites'.tr,
           style: TextStyle(
@@ -24,11 +39,6 @@ class FavoritesPage extends StatelessWidget {
         ),
       ),
       body: GetBuilder<ProductController>(
-        initState: (state) {
-          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-            state.controller?.fetchFavorites();
-          });
-        },
         builder: (controller) {
           if (controller.isFetchingFavorites) {
             return Column(
@@ -65,11 +75,20 @@ class FavoritesPage extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20, right: 20, top: 17),
               child: CustomScrollView(
                 physics: const ClampingScrollPhysics(),
+                controller: ScrollController(),
                 slivers: [
                   SliverProductGrid(
+                    onTap: (product) {
+                      Get.find<ProductController>().selectedProduct = product;
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ProductDetailsPage(),
+                      ));
+                    },
                     list: controller.favorites,
                   ),
-                  const SizedBox(height: 50),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 50),
+                  ),
                 ],
               ),
             ),
@@ -78,4 +97,7 @@ class FavoritesPage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

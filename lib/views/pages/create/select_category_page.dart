@@ -61,7 +61,7 @@ class SelectCategoryPage extends StatelessWidget {
                             ),
                           ),
                         )
-                      : SizedBox(),
+                      : const SizedBox(),
                 ],
               ),
             ),

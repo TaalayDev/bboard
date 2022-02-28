@@ -1,3 +1,5 @@
+import 'package:bboard/models/comment.dart';
+import 'package:bboard/resources/constants.dart';
 import 'package:flutter/widgets.dart';
 
 import '../helpers/helper.dart';
@@ -42,6 +44,8 @@ class Product {
     this.dictrict,
     this.updatedAt,
     this.createdAt,
+    this.status = 'moderation',
+    this.comments = const [],
   });
 
   final int id;
@@ -75,8 +79,11 @@ class Product {
   final List<Media> media;
   String? updatedAt;
   String? createdAt;
+  final String status;
+  final List<Comment> comments;
 
   String get getPrice => Helper.numberWithSpaces(price) + ' $currencySymbol';
+  String get shareLink => Constants.BASE_URL + '/products/$id';
 
   factory Product.fromMap(map) => Product(
         id: map['id'],
@@ -88,7 +95,8 @@ class Product {
         categoryId: map['category_id'],
         category:
             map['category'] != null ? Category.fromMap(map['category']) : null,
-        phones: Helper.parseList<String>(map['phones']),
+        phones: Helper.replaceAll(map['phones'].toString(), ['[', ']'], '')
+            .split(','),
         views: map['views'] ?? 0,
         canComment: map['can_comment'],
         isFavorite: map['is_favorite'] ?? false,
@@ -117,6 +125,9 @@ class Product {
         categoryParentsTree: map['category_tree'] != null
             ? Category.fromList(map['category_tree'])
             : null,
+        status: map['status']?.toString() ?? 'moderation',
+        comments:
+            map['comments'] != null ? Comment.fromList(map['comments']) : [],
       );
 
   static fromList(List list) => list.map((e) => Product.fromMap(e)).toList();

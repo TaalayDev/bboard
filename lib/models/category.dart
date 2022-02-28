@@ -9,6 +9,8 @@ class Category {
   Media? media;
   final List<Category> children;
   final List<CustomAttribute> customAttributes;
+  final String createdAt;
+  final String updatedAt;
 
   Category({
     required this.id,
@@ -18,6 +20,8 @@ class Category {
     this.media,
     this.children = const [],
     this.customAttributes = const [],
+    this.createdAt = '',
+    this.updatedAt = '',
   });
 
   factory Category.fromMap(map) => Category(
@@ -30,6 +34,8 @@ class Category {
         children: fromList(map['children'] ?? const []),
         customAttributes:
             CustomAttribute.fromList(map['custom_attribute'] ?? const []),
+        createdAt: map['created_at']?.toString() ?? '',
+        updatedAt: map['updated_at']?.toString() ?? '',
       );
 
   static fromList(List list) => list.map((e) => Category.fromMap(e)).toList();

@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bboard/models/category.dart';
+import 'package:bboard/resources/theme.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Helper {
   Helper._();
@@ -16,29 +12,36 @@ class Helper {
   static int? parseInt(val, {int? defVal = 0}) {
     try {
       return val is int ? val : int.parse(val);
-    } catch (e) {}
-
-    return defVal;
+    } catch (e) {
+      return defVal;
+    }
   }
 
   static double? parseDouble(val, {double? defVal = 0}) {
     try {
       return val is double ? val : double.parse(val);
-    } catch (e) {}
-
-    return defVal;
+    } catch (e) {
+      return defVal;
+    }
   }
 
-  static List<T> parseList<T>(data) {
+  static List<String> parseList(data) {
     try {
       if (data != null) {
-        if (data is List) return data as List<T>;
-        if (data is String) {
+        if (data is List) {
+          return data as List<String>;
+        } else {
           final val = json.decode(data);
-          if (val is List) return List<T>.from(val);
+          if (val is List) {
+            return List.from(val.map((e) => e.toString()));
+          } else {
+            return [val.toString()];
+          }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      print('parse error $e');
+    }
 
     return const [];
   }
@@ -72,9 +75,13 @@ class Helper {
     return deviceId;
   }
 
-  static String getMapHtml(
-      {lat = 0.0, lng = 0.0, double zoom = 15, autoInitMap = true}) {
-    final userIcon =
+  static String getMapHtml({
+    lat = 0.0,
+    lng = 0.0,
+    double zoom = 15,
+    autoInitMap = true,
+  }) {
+    const userIcon =
         '<svg style="margin: 10px;" width="30" height="30" viewBox="0 0 40 53" fill="none" xmlns="http://www.w3.org/2000/svg">'
         '<path d="M0 53C0 47.6957 2.10714 42.6086 5.85786 38.8579C9.60859 35.1071 14.6957 33 20 33C25.3043 33 30.3914 35.1071 34.1421 38.8579C37.8929 42.6086 40 47.6957 40 53H0ZM20 30.5C11.7125 30.5 5 23.7875 5 15.5C5 7.2125 11.7125 0.5 20 0.5C28.2875 0.5 35 7.2125 35 15.5C35 23.7875 28.2875 30.5 20 30.5Z" fill="white"/>'
         '</svg>';
@@ -232,6 +239,65 @@ class Helper {
     }
 
     return message;
+  }
+
+  static String convertUrlToId(String? url, {bool trimWhitespaces = true}) {
+    assert(url?.isNotEmpty ?? false, 'Url cannot be empty');
+    if (!url!.contains("http") && (url.length == 11)) return url;
+    if (trimWhitespaces) url = url.trim();
+
+    for (var exp in [
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
+    ]) {
+      Match? match = exp.firstMatch(url);
+      if (match != null && match.groupCount >= 1) return match.group(1) ?? '';
+    }
+
+    return url;
+  }
+
+  static OverlayEntry showLoader(BuildContext context) {
+    OverlayEntry loader = OverlayEntry(builder: (context) {
+      return DefaultTextStyle(
+        style: TextStyle(),
+        child: Align(
+          alignment: Alignment.center,
+          child: Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+              color: context.theme.background,
+              borderRadius: BorderRadius.circular(16.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 25),
+                Text(
+                  'Загрузка...',
+                  style: TextStyle(color: context.theme.mainTextColor),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+    Overlay.of(context)?.insert(loader);
+
+    return loader;
   }
 
   static unfocus() {

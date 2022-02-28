@@ -23,13 +23,17 @@ class UserAdapter extends TypeAdapter<User> {
       media: fields[4] as Media?,
       balance: fields[5] as double?,
       deviceToken: fields[6] as String?,
-    );
+      apiToken: fields[7] as String?,
+      activeCount: fields[8] as int?,
+    )
+      ..createdAt = fields[9] as String?
+      ..updatedAt = fields[10] as String?;
   }
 
   @override
   void write(BinaryWriter writer, User obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +45,15 @@ class UserAdapter extends TypeAdapter<User> {
       ..writeByte(5)
       ..write(obj.balance)
       ..writeByte(6)
-      ..write(obj.deviceToken);
+      ..write(obj.deviceToken)
+      ..writeByte(7)
+      ..write(obj.apiToken)
+      ..writeByte(8)
+      ..write(obj.activeCount)
+      ..writeByte(9)
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.updatedAt);
   }
 
   @override

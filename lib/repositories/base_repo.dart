@@ -30,6 +30,7 @@ class BaseRepo {
     final _interceptor = InterceptorsWrapper(
       onRequest: (options, handler) async {
         if (LocaleStorage.isLogin) {
+          // print('token ${LocaleStorage.token}');
           options.headers[HttpHeaders.authorizationHeader] =
               'Bearer ${LocaleStorage.token}';
         }
@@ -38,7 +39,8 @@ class BaseRepo {
       },
       onError: (error, handler) async {
         handler.next(error);
-        /*try {
+        /*
+        try {
           final statusCode = error.response?.statusCode;
           if (statusCode == 401) {
             LocaleStorage.token = null;
@@ -47,7 +49,8 @@ class BaseRepo {
           }
         } catch (e) {
           handler.next(error);
-        }*/
+        }
+        */
       },
     );
     dio.interceptors.add(_interceptor);

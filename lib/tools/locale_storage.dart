@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bboard/models/media.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -17,6 +18,7 @@ class LocaleStorage {
 
   static void _registerAdapters() {
     Hive.registerAdapter(UserAdapter());
+    Hive.registerAdapter(MediaAdapter());
   }
 
   static String? get token => _get('token');

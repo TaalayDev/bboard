@@ -1,20 +1,19 @@
 import 'dart:io';
 
-import 'package:bboard/models/app_reponse.dart';
-import 'package:bboard/models/region.dart';
-import 'package:bboard/tools/locale_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile;
-import 'package:get/get_connect/http/src/interceptors/get_modifiers.dart';
+import 'package:path/path.dart';
 
 import '../../models/product.dart';
+import '../models/app_reponse.dart';
 import '../models/category.dart';
 import '../models/currency.dart';
+import '../models/region.dart';
 import '../repositories/category_repo.dart';
 import '../repositories/product_repo.dart';
 import '../repositories/settings_repo.dart';
 import '../tools/image_picker.dart';
-import 'package:path/path.dart';
+import '../tools/locale_storage.dart';
 
 class ProductController extends GetxController {
   List<Product> products = [];
@@ -34,6 +33,7 @@ class ProductController extends GetxController {
 
   final int limit = 20;
   int offset = 0;
+  bool hasReachedMax = false;
 
   Product? _selectedProduct;
   Product? _productDetail;
@@ -55,31 +55,56 @@ class ProductController extends GetxController {
 
   Product? get productDetails => _productDetail ?? _selectedProduct;
 
-  Future<void> fetchProducts() async {
-    if (!isFetchingProducts && products.isEmpty) {
+  Future<void> fetchProducts({String? search}) async {
+    if (!isFetchingProducts) {
       offset = 0;
+      hasReachedMax = false;
 
       isFetchingProducts = true;
       update();
 
-      products =
-          await _fetchProducts(params: {'offset': offset, 'limit': limit});
+      final params = {
+        'offset': offset,
+        'limit': limit,
+        'with': 'user',
+        'orderBy': 'created_at',
+        'sortedBy': 'desc',
+      };
+      if (search != null && search.isNotEmpty) {
+        params['search'] = 'title:$search;description:$search';
+        params['searchFields'] = 'title:like;description:like';
+      }
+
+      products = await _fetchProducts(params: params);
 
       isFetchingProducts = false;
       update();
     }
   }
 
-  Future<void> fetchMoreProducts() async {
-    if (!isFetchingMore) {
+  Future<void> fetchMoreProducts({String? search}) async {
+    if (!isFetchingMore && !hasReachedMax) {
       offset += limit;
 
       isFetchingMore = true;
       update();
 
-      products.addAll(await _fetchProducts(
-        params: {'offset': offset, 'limit': limit},
-      ));
+      final params = {
+        'offset': offset,
+        'limit': limit,
+        'with': 'user',
+        'orderBy': 'created_at',
+        'sortedBy': 'desc',
+      };
+      if (search != null && search.isNotEmpty) {
+        params['search'] = search;
+      }
+      final p = await _fetchProducts(params: params);
+      if (p.isNotEmpty) {
+        products.addAll(p);
+      } else {
+        hasReachedMax = true;
+      }
 
       isFetchingMore = false;
       update();
@@ -117,6 +142,37 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<void> addToFavorites(Product product) async {
+    product.isFavorite = true;
+    update();
+
+    final appResponse = await _productRepo.addToFavorites(product.id);
+    if (appResponse.status) {
+      favorites.add(product);
+    } else {
+      product.isFavorite = false;
+    }
+
+    update();
+  }
+
+  Future<void> removeFromFavorites(Product product) async {
+    product.isFavorite = false;
+    update();
+
+    final appResponse = await _productRepo.removeFromFavorites(product.id);
+    if (appResponse.status) {
+      if (favorites.contains(product)) {
+        favorites.remove(product);
+      }
+      update();
+    } else {
+      product.isFavorite = true;
+    }
+
+    update();
+  }
+
   Future<List<Product>> _fetchProducts({Map<String, dynamic>? params}) async {
     final appResponse = await _productRepo.fetchProducts(params: params);
     if (appResponse.status) {
@@ -143,7 +199,7 @@ class ProductController extends GetxController {
     params['user_id'] = LocaleStorage.currentUser?.id;
     final result = await _productRepo.createProduct(params);
 
-    isLoading = true;
+    isLoading = false;
     update();
 
     return result;

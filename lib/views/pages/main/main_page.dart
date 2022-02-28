@@ -1,16 +1,16 @@
-import 'package:bboard/controllers/category_controller.dart';
-import 'package:bboard/controllers/product_controller.dart';
-import 'package:bboard/tools/app_router.dart';
-import 'package:bboard/tools/locale_storage.dart';
-import 'package:bboard/views/pages/auth/login_page.dart';
-import 'package:bboard/views/pages/create/select_category_page.dart';
-import 'package:bboard/views/pages/home/home_page.dart';
-import 'package:bboard/views/pages/profile/profile_page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide KeepAlive;
 import 'package:get/get.dart';
 
-import '../../../models/category.dart';
+import '../../../controllers/product_controller.dart';
+import '../../../tools/app_router.dart';
+import '../../../tools/locale_storage.dart';
 import '../../widgets/bottom_navigation.dart';
+import '../../widgets/want_keep_alive.dart';
+import '../create/select_category_page.dart';
+import '../favorites/favorites_page.dart';
+import '../home/home_page.dart';
+import '../notifications/notifications_page.dart';
+import '../profile/profile_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -24,17 +24,17 @@ class _MainPageState extends State<MainPage> {
   late final PageController _pageController;
 
   final screens = <Widget>[
-    HomePage(key: UniqueKey()),
-    HomePage(key: UniqueKey()),
-    SelectCategoryPage(key: UniqueKey()),
-    HomePage(key: UniqueKey()),
-    ProfilePage(key: UniqueKey()),
+    WantKeepAlive(child: HomePage(key: UniqueKey())),
+    WantKeepAlive(child: FavoritesPage(key: UniqueKey())),
+    WantKeepAlive(child: SelectCategoryPage(key: UniqueKey())),
+    WantKeepAlive(child: NotificationsPage(key: UniqueKey())),
+    WantKeepAlive(child: ProfilePage(key: UniqueKey())),
   ];
 
   @override
   void initState() {
     currentIndex = 0;
-    _pageController = PageController();
+    _pageController = PageController(keepPage: true);
     super.initState();
   }
 

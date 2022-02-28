@@ -1,12 +1,12 @@
-import 'package:bboard/repositories/settings_repo.dart';
 import 'package:get/get.dart';
 
 import '../controllers/category_controller.dart';
 import '../controllers/product_controller.dart';
 import '../controllers/user_controller.dart';
-import '../repositories/user_repo.dart';
 import '../repositories/category_repo.dart';
 import '../repositories/product_repo.dart';
+import '../repositories/settings_repo.dart';
+import '../repositories/user_repo.dart';
 
 class AppBindings implements Bindings {
   @override

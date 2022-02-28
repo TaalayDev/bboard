@@ -9,10 +9,12 @@ class CategorySlider extends StatelessWidget {
     Key? key,
     required this.list,
     this.horizontalPadding = 0,
+    this.onTap,
   }) : super(key: key);
 
   final List<Category> list;
   final double horizontalPadding;
+  final Function(Category category)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +28,13 @@ class CategorySlider extends StatelessWidget {
           itemBuilder: (context, index) {
             final _category = list[index];
 
-            return InkWell(
-              onTap: () {},
-              child: Padding(
-                padding: EdgeInsetsDirectional.only(
-                  start: index == 0 ? horizontalPadding : 10,
-                  end: index == list.length - 1 ? horizontalPadding : 0,
-                ),
+            return Padding(
+              padding: EdgeInsetsDirectional.only(
+                start: index == 0 ? horizontalPadding : 10,
+                end: index == list.length - 1 ? horizontalPadding : 0,
+              ),
+              child: InkWell(
+                onTap: () => onTap?.call(_category),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 4,

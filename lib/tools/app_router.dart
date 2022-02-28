@@ -2,6 +2,9 @@ import 'package:bboard/views/pages/add_phone/add_phone_page.dart';
 import 'package:bboard/views/pages/auth/login_page.dart';
 import 'package:bboard/views/pages/auth/register_page.dart';
 import 'package:bboard/views/pages/auth/verify_phone_page.dart';
+import 'package:bboard/views/pages/category_products/category_products_page.dart';
+import 'package:bboard/views/pages/change_password/change_password_page.dart';
+import 'package:bboard/views/pages/complaint/complaint_page.dart';
 import 'package:bboard/views/pages/create/create_product_page.dart';
 import 'package:bboard/views/pages/create/select_category_page.dart';
 import 'package:bboard/views/pages/main/main_page.dart';
@@ -10,8 +13,11 @@ import 'package:bboard/views/pages/settings/settings_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
+import '../views/pages/comments/comments_page.dart';
 import '../views/pages/home/home_page.dart';
 import '../views/pages/splash/splash_page.dart';
+import '../views/pages/my_products/my_products_page.dart';
+import '../views/pages/user_products/user_products_page.dart';
 
 class AppRouter {
   AppRouter._();
@@ -61,6 +67,11 @@ class AppRouter {
   static const String developers = '/developers';
   static const String developerDetails = '/developer_details';
   static const String addPhone = '/add_phone';
+  static const String categoryProducts = '/category_products';
+  static const String myProducts = '/my_products';
+  static const String userProducts = '/user_products';
+  static const String comments = '/comments';
+  static const String complaint = '/complaint';
 
   static String get initialRoute => splash;
 
@@ -68,13 +79,19 @@ class AppRouter {
     GetPage(name: splash, page: () => const SplashPage()),
     GetPage(name: login, page: () => const LoginPage()),
     GetPage(name: main, page: () => const MainPage()),
-    GetPage(name: home, page: () => const HomePage()),
+    GetPage(name: home, page: () => HomePage()),
     GetPage(name: productDetails, page: () => const ProductDetailsPage()),
     GetPage(name: registration, page: () => const RegisterPage()),
     GetPage(name: verifyCode, page: () => const VerifyPhonePage()),
     GetPage(name: settings, page: () => const SettingsPage()),
     GetPage(name: selectCategory, page: () => const SelectCategoryPage()),
     GetPage(name: createProduct, page: () => CreateProductPage()),
-    GetPage(name: addPhone, page: () => AddPhonePage()),
+    GetPage(name: addPhone, page: () => const AddPhonePage()),
+    GetPage(name: categoryProducts, page: () => CategoryProductsPage()),
+    GetPage(name: myProducts, page: () => const MyProductsPage()),
+    GetPage(name: userProducts, page: () => const UserProductsPage()),
+    GetPage(name: comments, page: () => CommentsPage()),
+    GetPage(name: complaint, page: () => const ComplaintPage()),
+    GetPage(name: changePassword, page: () => const ChangePasswordPage()),
   ];
 }

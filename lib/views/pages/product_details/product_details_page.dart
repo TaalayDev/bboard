@@ -1,22 +1,22 @@
-import 'package:bboard/models/custom_attribute.dart';
-import 'package:bboard/models/custom_attribute_values.dart';
-import 'package:bboard/models/product.dart';
-import 'package:bboard/resources/constants.dart';
-import 'package:bboard/views/widgets/app_image.dart';
-import 'package:bboard/views/widgets/app_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../controllers/product_controller.dart';
-import '../../../views/widgets/app_button.dart';
-import '../../../views/widgets/image_slider.dart';
+import '../../../models/product.dart';
+import '../../../resources/constants.dart';
 import '../../../resources/theme.dart';
-
-final testPhones = ['996775776775', '8875546643'];
+import '../../../tools/app_router.dart';
+import '../../../views/widgets/app_button.dart';
+import '../../widgets/app_carousel.dart';
+import '../../widgets/app_image.dart';
+import '../../widgets/app_network_image.dart';
+import '../../widgets/youtube_player.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   const ProductDetailsPage({
@@ -33,10 +33,17 @@ class ProductDetailsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Feather.share),
-            onPressed: () {},
-          ),
+          GetBuilder<ProductController>(builder: (controller) {
+            return IconButton(
+              icon: const Icon(Feather.share),
+              onPressed: () {
+                final productDetails = controller.productDetails;
+                Share.share(
+                  '${productDetails?.title}\n${productDetails?.shareLink}',
+                );
+              },
+            );
+          }),
           const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Feather.more_horizontal),
@@ -44,9 +51,21 @@ class ProductDetailsPage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
-        child: _FloatingCallButton(),
+      floatingActionButton: GetBuilder<ProductController>(
+        builder: (controller) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+            child: AppButton(
+              text: 'call'.tr,
+              onPressed: () {
+                showPhonesBottomSheet(
+                  context,
+                  controller.productDetails?.phones ?? [],
+                );
+              },
+            ),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: RefreshIndicator(
@@ -60,10 +79,105 @@ class ProductDetailsPage extends StatelessWidget {
                 ? SingleChildScrollView(
                     child: Column(
                       children: [
-                        ImagesSlider(
-                          images: productDetails.media
-                              .map((e) => e.originalUrl!)
-                              .toList(),
+                        Stack(
+                          children: [
+                            Container(
+                              color: context.theme.surface,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    height: 350,
+                                    child: AppCarousel(
+                                      productDetails.media
+                                          .map((e) => e.originalUrl!)
+                                          .toList(),
+                                      heroTag:
+                                          'product_${productDetails.id}_image',
+                                      video: productDetails.video,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Feather.eye,
+                                          size: 20,
+                                          color: context.theme.grey,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          productDetails.views.toString(),
+                                          style: TextStyle(
+                                            color: context.theme.grey,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const Divider(),
+                                ],
+                              ),
+                            ),
+                            if (productDetails.video != null &&
+                                productDetails.video!.isNotEmpty)
+                              Positioned(
+                                bottom: 18,
+                                right: 15,
+                                child: Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50.0),
+                                  ),
+                                  child: SizedBox(
+                                    height: 40,
+                                    width: 40,
+                                    child: InkWell(
+                                      child: Icon(
+                                        MaterialCommunityIcons.youtube,
+                                        color: context.theme.accent,
+                                        size: 24,
+                                      ),
+                                      onTap: () {
+                                        Get.dialog(
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0),
+                                                child: YoutubePlayer(
+                                                  videoUrl:
+                                                      productDetails.video!,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 10,
+                                                right: 10,
+                                                child: Material(
+                                                  color: Colors.transparent,
+                                                  child: CloseButton(
+                                                    color: Colors.white,
+                                                    onPressed: () {
+                                                      Get.back();
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -71,24 +185,6 @@ class ProductDetailsPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 5),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Feather.eye,
-                                    size: 20,
-                                    color: context.theme.grey,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    productDetails.views.toString(),
-                                    style: TextStyle(
-                                      color: context.theme.grey,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Divider(),
                               Text(
                                 'Добавлено ' +
                                     Jiffy(productDetails.createdAt).fromNow(),
@@ -174,8 +270,8 @@ class ProductDetailsPage extends StatelessWidget {
                                               ),
                                               Expanded(
                                                 child: Text(
-                                                  e.value,
-                                                  style: TextStyle(
+                                                  e.value ?? '',
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
                                                 ),
@@ -186,8 +282,7 @@ class ProductDetailsPage extends StatelessWidget {
                                     .toList(),
                               const Divider(),
                               const SizedBox(height: 5),
-                              Text(productDetails.description +
-                                  ' hbhsdbckbd shbcksbdkvb skjdbksdbvk skdjbcvkljsdbnv skjdbkjsbdv ksjdbk'),
+                              Text(productDetails.description),
                               const SizedBox(height: 10),
                             ],
                           ),
@@ -225,10 +320,17 @@ class ProductDetailsPage extends StatelessWidget {
                           child: Column(
                             children: [
                               ListTile(
-                                onTap: () {},
+                                onTap: () {
+                                  if (productDetails.comments.isNotEmpty) {
+                                    Get.toNamed(AppRouter.comments,
+                                        arguments: productDetails.id);
+                                  }
+                                },
                                 title: Text(
-                                  'Комментариев нет',
-                                  style: TextStyle(
+                                  productDetails.comments.isEmpty
+                                      ? 'Комментариев нет'
+                                      : '${productDetails.comments.length} комментариев',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     color: Colors.blue,
                                   ),
@@ -236,8 +338,14 @@ class ProductDetailsPage extends StatelessWidget {
                               ),
                               const Divider(height: 1),
                               ListTile(
-                                onTap: () {},
-                                title: Text(
+                                onTap: () {
+                                  Clipboard.setData(ClipboardData(
+                                    text: productDetails.shareLink,
+                                  )).then((value) {
+                                    showToast('Ссылка скопирована');
+                                  });
+                                },
+                                title: const Text(
                                   'Скопировать ссылку',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -247,8 +355,11 @@ class ProductDetailsPage extends StatelessWidget {
                               ),
                               const Divider(height: 1),
                               ListTile(
-                                onTap: () {},
-                                title: Text(
+                                onTap: () {
+                                  Get.toNamed(AppRouter.complaint,
+                                      arguments: productDetails);
+                                },
+                                title: const Text(
                                   'Пожаловаться на объявление',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -281,20 +392,49 @@ class ProductDetailsPage extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CircleAvatar(
+                                  /*CircleAvatar(
                                     child: AppImage(Assets.instagramRound),
+                                  ),*/
+                                  InkWell(
+                                    onTap: () {
+                                      launch(
+                                          'https://www.facebook.com/sharer/sharer.php?u=${productDetails.shareLink}');
+                                    },
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: const CircleAvatar(
+                                      child: AppImage(Assets.facebookRound),
+                                    ),
                                   ),
-                                  CircleAvatar(
-                                    child: AppImage(Assets.facebookRound),
+                                  InkWell(
+                                    onTap: () {
+                                      launch(
+                                          'https://connect.ok.ru/offer?url=${productDetails.shareLink}&title=${productDetails.title}');
+                                    },
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: const CircleAvatar(
+                                      child:
+                                          AppImage(Assets.odnoklassnikiRound),
+                                    ),
                                   ),
-                                  CircleAvatar(
-                                    child: AppImage(Assets.odnoklassnikiRound),
+                                  InkWell(
+                                    onTap: () {
+                                      launch(
+                                          'http://vk.com/share.php?url=${productDetails.shareLink}&text=${productDetails.title}');
+                                    },
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: const CircleAvatar(
+                                      child: AppImage(Assets.vkRound),
+                                    ),
                                   ),
-                                  CircleAvatar(
-                                    child: AppImage(Assets.vkRound),
-                                  ),
-                                  CircleAvatar(
-                                    child: AppImage(Assets.twitterRound),
+                                  InkWell(
+                                    onTap: () {
+                                      launch(
+                                          'http://twitter.com/share?url=${productDetails.shareLink}&text=${productDetails.title}');
+                                    },
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: const CircleAvatar(
+                                      child: AppImage(Assets.twitterRound),
+                                    ),
                                   ),
                                   Container(
                                     height: 38,
@@ -304,9 +444,16 @@ class ProductDetailsPage extends StatelessWidget {
                                           context.theme.grey.withOpacity(0.5),
                                       borderRadius: BorderRadius.circular(40),
                                     ),
-                                    child: Icon(
-                                      Icons.more_horiz,
-                                      color: Colors.white,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(40),
+                                      onTap: () {
+                                        Share.share(
+                                            '${productDetails.title}\n${productDetails.shareLink}');
+                                      },
+                                      child: const Icon(
+                                        Icons.more_horiz,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   )
                                 ],
@@ -326,6 +473,65 @@ class ProductDetailsPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> showPhonesBottomSheet(
+      BuildContext context, List<String> phones) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15.0, top: 5, bottom: 5),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Выберите номер',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(MaterialCommunityIcons.close),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (phones.isNotEmpty) ...[
+              ...phones.map((e) {
+                if (e.isNotEmpty) {
+                  return ListTile(
+                    title: Text('+ $e'),
+                    onTap: () {
+                      launch('tel: +$e');
+                    },
+                  );
+                }
+
+                return const SizedBox();
+              }),
+            ] else
+              SizedBox(
+                height: 100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text('Кажется, тут пусто'),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 15),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class UserCard extends StatelessWidget {
@@ -343,6 +549,9 @@ class UserCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 15),
       color: context.theme.surface,
       child: ListTile(
+        onTap: () {
+          Get.toNamed(AppRouter.userProducts, arguments: productDetails.user);
+        },
         contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
         leading: SizedBox(
           height: 50,
@@ -356,7 +565,7 @@ class UserCard extends StatelessWidget {
         ),
         title: Text(
           productDetails.user!.name ?? '',
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -374,26 +583,14 @@ class UserCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6.0),
               ),
               child: Text(
-                '7 объявлений пользователя',
-                style: TextStyle(fontSize: 12),
+                '${productDetails.user!.activeCount ?? 0} объявлений пользователя',
+                style: const TextStyle(fontSize: 12),
               ),
             ),
           ],
         ),
-        trailing: Icon(Icons.arrow_forward_ios),
+        trailing: const Icon(Icons.arrow_forward_ios),
       ),
-    );
-  }
-}
-
-class _FloatingCallButton extends StatelessWidget {
-  const _FloatingCallButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppButton(
-      text: 'call'.tr,
-      onPressed: () {},
     );
   }
 }

@@ -12,7 +12,7 @@ class CreateProductPage extends StatelessWidget {
   CreateProductPage({Key? key}) : super(key: key);
 
   final FormBuilderController formController = FormBuilderController(values: {
-    'phones': [
+    'phones[]': [
       LocaleStorage.currentUser?.phone ?? '',
     ],
   });
@@ -65,11 +65,16 @@ class CreateProductPage extends StatelessWidget {
               final result = await controller.createNewProduct(values);
               if (result.status) {
                 controller.selectedProduct = result.data!;
+                Get.snackbar(
+                  'app_title'.tr,
+                  'Ваше объявление отправлено на модерацию!',
+                );
                 Get.offAndToNamed(AppRouter.productDetails);
               } else {
-                Get.snackbar('app_title'.tr, 'Ошибка');
-                print(
-                    'product creating error ${result.errorData} ${result.status}');
+                Get.snackbar(
+                  'app_title'.tr,
+                  'Ошибка при добавлении! Проверьте ваше подключение',
+                );
               }
             },
           );

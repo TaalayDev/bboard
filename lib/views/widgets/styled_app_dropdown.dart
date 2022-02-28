@@ -12,6 +12,9 @@ class StyledAppDropDown<T> extends StatefulWidget {
   final String? title;
   final String? label;
   final T? value;
+  final double? radius;
+  final Color? color;
+  final Widget? leading;
   final String Function(dynamic val) displayItem;
   final Function(dynamic item)? onChanged;
 
@@ -23,6 +26,9 @@ class StyledAppDropDown<T> extends StatefulWidget {
     this.title,
     this.label,
     this.value,
+    this.radius,
+    this.color,
+    this.leading,
     this.onChanged,
   }) : super(key: key);
 
@@ -30,8 +36,7 @@ class StyledAppDropDown<T> extends StatefulWidget {
   _StyledAppDropDownState<T> createState() => _StyledAppDropDownState<T>();
 }
 
-class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
-    with AutomaticKeepAliveClientMixin {
+class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
   late final AnimateIconController _animateIconController;
   bool _menuOpened = false;
   T? _selectedItem;
@@ -55,23 +60,23 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
+    final radius = widget.radius ?? 6.0;
     return Column(
       children: [
         InkWell(
           borderRadius: _menuOpened
-              ? const BorderRadius.only(
-                  topLeft: Radius.circular(6.0),
-                  topRight: Radius.circular(6.0),
+              ? BorderRadius.only(
+                  topLeft: Radius.circular(radius),
+                  topRight: Radius.circular(radius),
                 )
-              : BorderRadius.circular(6.0),
+              : BorderRadius.circular(radius),
           onTap: () {
             _openCloseMenu();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 5),
             decoration: BoxDecoration(
-              color: Get.theme.greyWeak,
+              color: widget.color ?? Get.theme.greyWeak,
               borderRadius: _menuOpened
                   ? const BorderRadius.only(
                       topLeft: Radius.circular(6.0),
@@ -81,6 +86,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
             ),
             child: ListTile(
               contentPadding: EdgeInsets.only(left: 18),
+              leading: widget.leading,
               title: Text(
                 _selectedItem != null
                     ? widget.displayItem(_selectedItem)
@@ -114,7 +120,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
         ),
         Container(
           decoration: BoxDecoration(
-            color: Get.theme.greyWeak,
+            color: widget.color ?? Get.theme.greyWeak,
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(6.0),
               bottomRight: Radius.circular(6.0),
@@ -197,7 +203,4 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>>
             ? _animateIconController.animateToEnd()
             : _animateIconController.animateToStart();
       });
-
-  @override
-  bool get wantKeepAlive => true;
 }

@@ -4,7 +4,7 @@ import 'package:bboard/models/custom_attribute.dart';
 class CustomAttributeValues {
   final int id;
   final int attributeId;
-  final String value;
+  final String? value;
   final CustomAttribute? customAttribute;
 
   const CustomAttributeValues({
@@ -19,7 +19,7 @@ class CustomAttributeValues {
         attributeId: map['attribute_id'],
         value: map['value'],
         customAttribute: map['custom_attribute'] != null
-            ? CustomAttribute.fromList(map['custom_attribute'])
+            ? CustomAttribute.fromMap(map['custom_attribute'])
             : null,
       );
 

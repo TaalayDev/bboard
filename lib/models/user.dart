@@ -20,6 +20,12 @@ class User {
   String? deviceToken;
   @HiveField(7)
   String? apiToken;
+  @HiveField(8)
+  int? activeCount;
+  @HiveField(9)
+  String? createdAt;
+  @HiveField(10)
+  String? updatedAt;
 
   String? get avatar => media?.originalUrl;
 
@@ -31,14 +37,18 @@ class User {
     this.balance,
     this.deviceToken,
     this.apiToken,
+    this.activeCount,
   });
 
   User.fromMap(map) {
     id = map['id'];
     name = map['name'];
     phone = map['phone'];
-    media = map['has_media'] ? Media.fromMap(['media'][0]) : null;
+    media = map['has_media'] ? Media.fromMap(map['media'][0]) : null;
     deviceToken = map['device_token'];
     apiToken = map['api_token'];
+    activeCount = map['active_count']?.toInt() ?? 0;
+    createdAt = map['created_at']?.toString();
+    createdAt = map['updated_at']?.toString();
   }
 }

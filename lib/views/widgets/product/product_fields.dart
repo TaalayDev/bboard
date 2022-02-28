@@ -61,7 +61,7 @@ class ProductFields extends StatelessWidget {
             final category = this.category;
             final region = formController.getValue<Region>('region');
             final city = formController.getValue<City>('city');
-            final phones = formController.getValue<List<String>>('phones');
+            final phones = formController.getValue<List<String>>('phones[]');
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,6 +181,7 @@ class ProductFields extends StatelessWidget {
                           displayItem: (item) => item.symbol,
                         ),
                       ),
+                      /*
                       const Divider(height: 0),
                       ListTile(
                         contentPadding:
@@ -193,6 +194,7 @@ class ProductFields extends StatelessWidget {
                           },
                         ),
                       ),
+                      */
                     ],
                   ),
                 ),
@@ -287,9 +289,9 @@ class ProductFields extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   child: TextFormField(
                     maxLength: 100,
-                    initialValue: formController.getValue('video_url'),
+                    initialValue: formController.getValue('video'),
                     onChanged: (value) {
-                      formController.setValue('video_url', value);
+                      formController.setValue('video', value);
                     },
                     decoration: const InputDecoration(
                       hintText: 'Ссылка на YouTube',
@@ -353,7 +355,8 @@ class ProductFields extends StatelessWidget {
                                 ? TextButton(
                                     onPressed: () {
                                       phones.remove(item.value);
-                                      formController.setValue('phones', phones);
+                                      formController.setValue(
+                                          'phones[]', phones);
                                     },
                                     child: Icon(
                                       Icons.delete_outline,
@@ -372,7 +375,7 @@ class ProductFields extends StatelessWidget {
                                   await Get.toNamed(AppRouter.addPhone);
                               if (phone != null && !phones.contains(phone)) {
                                 phones.add(phone);
-                                formController.setValue('phones', phones);
+                                formController.setValue('phones[]', phones);
                               }
                             },
                             child: const Text('Добавить телефон'),

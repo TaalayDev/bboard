@@ -1,3 +1,4 @@
+import 'package:bboard/helpers/helper.dart';
 import 'package:hive/hive.dart';
 
 part 'media.g.dart';
@@ -24,11 +25,11 @@ class Media {
   });
 
   Media.fromMap(map) {
-    id = map['id'];
-    fileName = map['file_name'];
-    mimeType = map['mime_type'];
+    id = Helper.parseInt(map['id']?.toString()) ?? 0;
+    fileName = map['file_name']?.toString();
+    mimeType = map['mime_type']?.toString();
     generatedConversions = Map<String, bool>.from(map['generated_conversions']);
-    originalUrl = map['original_url'];
+    originalUrl = map['original_url']?.toString();
   }
 
   static fromList(List list) => list.map((e) => Media.fromMap(e)).toList();
