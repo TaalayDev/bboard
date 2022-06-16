@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/badge.dart';
+import '../../../data/models/badge_model.dart';
 import '../app_icon.dart';
 
 class ProductBadge extends StatelessWidget {
-  final Badge type;
+  final BadgeModel type;
 
   const ProductBadge({
     Key? key,

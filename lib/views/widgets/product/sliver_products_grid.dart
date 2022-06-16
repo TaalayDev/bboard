@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../../../data/models/product.dart';
 import '../../../helpers/sizer_utils.dart';
-import '../../../models/product.dart';
 import 'product_grid_item.dart';
 
 class SliverProductGrid extends StatelessWidget {
   final List<Product> list;
   final String heroTag;
-  final Function? onUpdate;
   final EdgeInsets? padding;
   final Function(Product item)? onTap;
+  final Function(Product item) onHeartTap;
 
   const SliverProductGrid({
     Key? key,
     required this.list,
     this.heroTag = 'product_grid_item_',
     this.padding,
-    this.onUpdate,
     this.onTap,
+    required this.onHeartTap,
   }) : super(key: key);
 
   @override
@@ -31,6 +31,7 @@ class SliverProductGrid extends StatelessWidget {
           child: ProductGridItem(
             product: list[index],
             heroTag: heroTag,
+            onHeartTap: () => onHeartTap(list[index]),
           ),
         ),
         childCount: list.length,

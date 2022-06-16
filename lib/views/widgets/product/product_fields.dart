@@ -1,23 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bboard/helpers/helper.dart';
-import 'package:bboard/models/currency.dart';
-import 'package:bboard/models/region.dart';
-import 'package:bboard/tools/app_router.dart';
-import 'package:bboard/tools/locale_storage.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../models/category.dart';
-import '../../../models/city.dart';
-import '../../../models/custom_attribute.dart';
-import '../../../models/district.dart';
-import '../../../resources/theme.dart';
+import '../../../res/theme.dart';
+import '../../../data/models/category.dart';
+import '../../../data/models/city.dart';
+import '../../../data/models/currency.dart';
+import '../../../data/models/custom_attribute.dart';
+import '../../../data/models/district.dart';
+import '../../../data/models/region.dart';
+import '../../../helpers/helper_functions.dart' as helper;
+import '../../screens/add_phone/add_phone_screen.dart';
 import '../app_button.dart';
 import '../app_network_image.dart';
 import '../custom_card.dart';
@@ -38,8 +37,10 @@ class ProductFields extends StatelessWidget {
     this.onRemoveImage,
     this.onCategoryTap,
     this.onSendTap,
+    this.buttonText,
   }) : super(key: key);
 
+  final String? buttonText;
   final FormBuilderController formController;
   final bool loadingCategory;
   final bool isSending;
@@ -93,12 +94,15 @@ class ProductFields extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (category.parent != null)
-                                  Text(getParentsTree(category.parent!))
-                                      .paddingOnly(bottom: 3),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 3.0),
+                                    child: Text(helper
+                                        .getParentsTree(category.parent!)),
+                                  ),
                                 Text(
                                   category.name,
                                   style: TextStyle(
-                                    color: Theme.of(context).primary,
+                                    color: context.theme.primary,
                                     fontSize: 16,
                                   ),
                                 )
@@ -371,8 +375,9 @@ class ProductFields extends StatelessWidget {
                           padding: const EdgeInsets.only(left: 8.0),
                           child: TextButton(
                             onPressed: () async {
-                              final phone =
-                                  await Get.toNamed(AppRouter.addPhone);
+                              final phone = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) => AddPhoneScreen()));
                               if (phone != null && !phones.contains(phone)) {
                                 phones.add(phone);
                                 formController.setValue('phones[]', phones);
@@ -390,7 +395,7 @@ class ProductFields extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: AppButton(
-                    text: 'Подать объявление',
+                    text: buttonText ?? 'Подать объявление',
                     loading: isSending,
                     onPressed: () {
                       final values = {...formController.getValues()};
@@ -409,8 +414,11 @@ class ProductFields extends StatelessWidget {
                         }
                       }
                       if (hasErrors) {
-                        Get.snackbar('app_title'.tr,
-                            'Вы не заполнили все обязательные поля');
+                        /*Get.snackbar(
+                          'app_title'.tr,
+                          'Вы не заполнили все обязательные поля',
+                        );*/
+                        // TODO: add snackbar
                         return;
                       }
                       values['region_id'] = values['region'].id;
@@ -427,13 +435,6 @@ class ProductFields extends StatelessWidget {
             );
           }),
     );
-  }
-
-  String getParentsTree(Category category) {
-    return (category.parent != null
-            ? getParentsTree(category.parent!) + ' > '
-            : '') +
-        category.name;
   }
 }
 
@@ -528,10 +529,15 @@ class ImagesGrid extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                         child: isAsset
                             ? images[index - 1] != null
-                                ? Image.file(
-                                    images[index - 1],
-                                    fit: BoxFit.cover,
-                                  )
+                                ? kIsWeb
+                                    ? Image.network(
+                                        images[index - 1].path,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        images[index - 1],
+                                        fit: BoxFit.cover,
+                                      )
                                 : SizedBox()
                             : AppNetworkImage(
                                 imageUrl: images[index - 1].image,

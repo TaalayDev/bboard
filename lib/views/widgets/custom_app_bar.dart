@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../../resources/theme.dart';
+import '../../res/theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
@@ -24,7 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         onPressed: onBackPressed ??
             () {
-              Get.back();
+              Navigator.pop(context);
             },
         icon: backIcon ?? const Icon(Icons.arrow_back_ios),
       ),
@@ -32,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: Get.theme.onPrimary,
+          color: context.theme.onPrimary,
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),

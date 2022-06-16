@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -26,11 +25,14 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           loading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(),
-                ).paddingOnly(right: 15)
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 15.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               : const SizedBox(),
           Text(text,
               style: const TextStyle(

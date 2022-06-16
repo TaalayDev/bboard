@@ -1,9 +1,7 @@
 import 'package:animate_icons/animate_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../../resources/theme.dart';
-
+import '../../res/theme.dart';
 import 'app_expandable.dart';
 
 class StyledAppDropDown<T> extends StatefulWidget {
@@ -76,7 +74,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 5),
             decoration: BoxDecoration(
-              color: widget.color ?? Get.theme.greyWeak,
+              color: widget.color ?? context.theme.greyWeak,
               borderRadius: _menuOpened
                   ? const BorderRadius.only(
                       topLeft: Radius.circular(6.0),
@@ -93,7 +91,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
                     : widget.label ?? widget.hintText ?? '',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Get.theme.greyStrong.withOpacity(
+                  color: context.theme.greyStrong.withOpacity(
                       _selectedItem != null || widget.label != null
                           ? 1.0
                           : 0.5),
@@ -102,8 +100,8 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
               trailing: AnimateIcons(
                 startIcon: Icons.keyboard_arrow_down,
                 endIcon: Icons.keyboard_arrow_up,
-                endIconColor: Get.theme.grey,
-                startIconColor: Get.theme.grey,
+                endIconColor: context.theme.grey,
+                startIconColor: context.theme.grey,
                 duration: const Duration(milliseconds: 500),
                 onEndIconPress: () {
                   _openCloseMenu();
@@ -120,7 +118,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: widget.color ?? Get.theme.greyWeak,
+            color: widget.color ?? context.theme.greyWeak,
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(6.0),
               bottomRight: Radius.circular(6.0),
@@ -138,7 +136,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
                     children: widget.list.asMap().entries.map(
                       (e) {
                         final _textColor =
-                            Get.theme.greyStrong.withOpacity(0.5);
+                            context.theme.greyStrong.withOpacity(0.5);
                         return InkWell(
                           onTap: () {
                             setState(() {
@@ -178,7 +176,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
   }
 
   _radio(value) {
-    final greyColor = Get.theme.grey.withOpacity(0.5);
+    final greyColor = context.theme.grey.withOpacity(0.5);
     return Container(
       height: 18,
       width: 18,
@@ -190,7 +188,7 @@ class _StyledAppDropDownState<T> extends State<StyledAppDropDown<T>> {
       child: Container(
         padding: const EdgeInsets.all(1.0),
         decoration: BoxDecoration(
-          color: value == _selectedItem ? Get.theme.primary : greyColor,
+          color: value == _selectedItem ? context.theme.primary : greyColor,
           borderRadius: BorderRadius.circular(50.0),
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../resources/theme.dart';
-import '../../../models/category.dart';
+import '../../../data/models/category.dart';
+import '../../../res/theme.dart';
 import '../app_network_image.dart';
 
 class CategorySlider extends StatelessWidget {
@@ -41,7 +41,7 @@ class CategorySlider extends StatelessWidget {
                     horizontal: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.theme.surface,
+                    color: context.theme.surface,
                     borderRadius: BorderRadius.circular(4.0),
                   ),
                   child: Row(

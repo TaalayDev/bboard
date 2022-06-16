@@ -1,10 +1,9 @@
-import 'package:bboard/tools/locale_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/comment.dart';
-import '../../resources/theme.dart';
+import '../../data/models/comment.dart';
+import '../../data/storage.dart';
+import '../../res/theme.dart';
 import 'app_network_image.dart';
 
 class CommentsList extends StatelessWidget {
@@ -93,7 +92,8 @@ class CommentsList extends StatelessWidget {
                                 ],
                                 Text(
                                   comment.text,
-                                  style: TextStyle(color: Get.theme.greyMedium),
+                                  style: TextStyle(
+                                      color: context.theme.greyMedium),
                                 ),
                               ],
                             ),
@@ -106,7 +106,7 @@ class CommentsList extends StatelessWidget {
                           Text(
                             formatter.format(DateTime.parse(comment.createdAt)),
                             style: TextStyle(
-                              color: Get.theme.grey,
+                              color: context.theme.grey,
                               fontSize: 12,
                             ),
                           ),
@@ -115,7 +115,7 @@ class CommentsList extends StatelessWidget {
                             onPressed: () {
                               onReply?.call(comment);
                             },
-                            child: Text('reply'.tr),
+                            child: Text('reply'),
                           ),
                           if (LocaleStorage.currentUser?.id ==
                               comment.userId) ...[
@@ -124,7 +124,7 @@ class CommentsList extends StatelessWidget {
                                 onRemove?.call(comment);
                               },
                               child: Text(
-                                'delete'.tr,
+                                'delete',
                                 style: TextStyle(color: Colors.redAccent),
                               ),
                             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../helpers/helper.dart';
+import '../../helpers/helper_functions.dart';
 
 class YoutubePlayer extends StatelessWidget {
   const YoutubePlayer({
@@ -15,7 +15,7 @@ class YoutubePlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return YoutubePlayerIFrame(
       controller: YoutubePlayerController(
-        initialVideoId: Helper.convertUrlToId(videoUrl),
+        initialVideoId: convertUrlToId(videoUrl),
         params: const YoutubePlayerParams(
           showControls: true,
           showFullscreenButton: true,

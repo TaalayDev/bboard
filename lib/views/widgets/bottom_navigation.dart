@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:get/get.dart';
 
-import '../../resources/theme.dart';
+import '../../res/theme.dart';
+import '../../data/models/key_value.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({
@@ -19,35 +19,28 @@ class BottomNavigation extends StatelessWidget {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: currentTab,
-      selectedItemColor: Get.theme.primary,
-      unselectedItemColor: Get.theme.mainTextColor,
+      selectedItemColor: context.theme.primary,
+      unselectedItemColor: context.theme.mainTextColor,
       selectedFontSize: 12,
       unselectedFontSize: 12,
       onTap: (index) {
         onTap?.call(index);
       },
       items: [
-        BottomNavigationBarItem(
-          icon: const Icon(Feather.search).paddingOnly(bottom: 3),
-          label: 'Поиск',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Feather.heart).paddingOnly(bottom: 3),
-          label: 'Избранное',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Feather.plus_circle).paddingOnly(bottom: 3),
-          label: 'Подать',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Feather.bell).paddingOnly(bottom: 3),
-          label: 'Уведомления',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Feather.user).paddingOnly(bottom: 3),
-          label: 'Кабинет',
-        ),
-      ],
+        KeyValue(key: 'Поиск', value: Feather.search),
+        KeyValue(key: 'Избранное', value: Feather.heart),
+        KeyValue(key: 'Подать', value: Feather.plus_circle),
+        KeyValue(key: 'Уведомления', value: Feather.bell),
+        KeyValue(key: 'Кабинет', value: Feather.user),
+      ]
+          .map((item) => BottomNavigationBarItem(
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Icon(item.value),
+                ),
+                label: item.key,
+              ))
+          .toList(),
     );
   }
 }

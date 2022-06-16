@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_builder/cached_network_image_builder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../../resources/constants.dart';
-import '../../resources/theme.dart';
+import '../../data/constants.dart';
+import '../../res/theme.dart';
 
 class AppNetworkImage extends StatelessWidget {
   final String imageUrl;
@@ -25,6 +26,36 @@ class AppNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      /*return CachedNetworkImageBuilder(
+        url: imageUrl,
+        placeHolder: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(context.theme.primary),
+            ),
+          ),
+        ),
+        errorWidget: errorWidget,
+        builder: (image) {
+          return Image.file(
+            image,
+            fit: fit ?? BoxFit.cover,
+            height: height,
+            width: width,
+          );
+        },
+      );*/
+      return Image.network(
+        imageUrl,
+        fit: fit ?? BoxFit.cover,
+        height: height,
+        width: width,
+      );
+    }
+
     return CachedNetworkImage(
       imageUrl: imageUrl,
       fit: fit ?? BoxFit.cover,

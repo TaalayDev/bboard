@@ -1,46 +1,61 @@
 import 'dart:io';
 
-import 'package:device_preview/device_preview.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:event/event.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:oktoast/oktoast.dart';
 
-import 'helpers/my_http_overrides.dart';
+import 'data/data_provider.dart';
+import 'data/events/product_events.dart';
+import 'data/repositories/category_repo.dart';
+import 'data/repositories/product_repo.dart';
+import 'data/repositories/settings_repo.dart';
+import 'data/repositories/user_repo.dart';
 import 'helpers/sizer_utils.dart';
-import 'resources/app_bindings.dart';
-import 'resources/app_translations.dart';
-import 'resources/theme.dart';
-import 'tools/app_router.dart';
-import 'tools/locale_storage.dart';
-import 'tools/push_notifications_manager.dart';
+import 'res/routes.dart';
+import 'bloc/user_bloc.dart';
+import 'data/api_client.dart';
+import 'data/storage.dart';
+import 'helpers/my_http_overrides.dart';
+import 'res/theme.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   HttpOverrides.global = MyHttpOverrides();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await LocaleStorage.init();
-  // await Jiffy.locale('ru');
-  try {
-    if (Platform.isAndroid || Platform.isIOS) {
-      await Firebase.initializeApp();
-      PushNotificationsManager().init();
-    }
 
-    if (Platform.isAndroid) {
-      await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-    }
-  } catch (e) {}
+  await EasyLocalization.ensureInitialized();
 
-  runApp(
-    DevicePreview(
-      enabled: (kIsWeb || Platform.isWindows) && !kReleaseMode,
-      builder: (context) => const App(),
-    ),
-  );
+  registerDependencies();
+
+  Firebase.initializeApp();
+
+  runApp(EasyLocalization(
+    supportedLocales: const [Locale('ru', 'RU')],
+    fallbackLocale: const Locale('ru', 'RU'),
+    path: 'assets/translations',
+    child: const App(),
+  ));
+}
+
+void registerDependencies() {
+  final getIt = GetIt.instance;
+  final client = ApiClient.init();
+
+  // repositories
+  getIt.registerLazySingleton(() => UserRepo(client: client));
+  getIt.registerLazySingleton(() => ProductRepo(client: client));
+  getIt.registerLazySingleton(() => CategoryRepo(client: client));
+  getIt.registerLazySingleton(() => SettingsRepo(client: client));
+
+  // events
+  getIt.registerLazySingleton(() => Event<ProductEvent>());
 }
 
 class App extends StatelessWidget {
@@ -48,22 +63,33 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      SizerUtils.init(constraints);
-      return OKToast(
-        child: GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          locale: const Locale('ru', 'RU'),
-          translations: AppTranslations(),
-          title: 'Bazar',
-          theme: AppTheme.lightTheme.themeData,
-          darkTheme: AppTheme.darkTheme.themeData,
-          themeMode: ThemeMode.light,
-          initialRoute: AppRouter.initialRoute,
-          getPages: AppRouter.pages,
-          initialBinding: AppBindings(),
+    return OKToast(
+      child: MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider(create: (_) => DataProvider()),
+        ],
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => UserBloc(isLogin: LocaleStorage.isLogin),
+            ),
+          ],
+          child: LayoutBuilder(builder: (context, constraints) {
+            SizerUtils.init(constraints);
+            return MaterialApp.router(
+              title: 'app_title'.tr(),
+              routeInformationParser: Routes.routeInformationParser,
+              routerDelegate: Routes.routerDelegate,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              theme: AppTheme.lightTheme.themeData,
+              darkTheme: AppTheme.darkTheme.themeData,
+              themeMode: ThemeMode.light,
+            );
+          }),
         ),
-      );
-    });
+      ),
+    );
   }
 }

@@ -1,10 +1,9 @@
-import 'package:bboard/helpers/helper.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../../resources/theme.dart';
+import '../../res/theme.dart';
 import 'app_network_image.dart';
 
 class AppCarousel extends StatefulWidget {

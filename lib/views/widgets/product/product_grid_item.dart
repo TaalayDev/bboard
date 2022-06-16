@@ -1,18 +1,15 @@
-import 'package:bboard/helpers/sizer_utils.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 
-import '../../../controllers/product_controller.dart';
-import '../../../models/product.dart';
-import '../../../resources/constants.dart';
-import '../../../resources/theme.dart';
+import '../../../data/constants.dart';
+import '../../../data/models/product.dart';
+import '../../../res/theme.dart';
 import '../../widgets/app_icon.dart';
+import '../app_network_image.dart';
 import 'product_badge.dart';
 
-class ProductGridItem extends StatelessWidget {
+class ProductGridItem extends StatefulWidget {
   final String heroTag;
   final Product product;
   final double? width;
@@ -29,15 +26,20 @@ class ProductGridItem extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ProductGridItem> createState() => _ProductGridItemState();
+}
+
+class _ProductGridItemState extends State<ProductGridItem> {
+  @override
   Widget build(BuildContext context) {
     // final height = 260.0;
     return Container(
       // height: height,
-      constraints: BoxConstraints(maxHeight: 260),
-      width: width ?? double.infinity,
+      constraints: const BoxConstraints(maxHeight: 260),
+      width: widget.width ?? double.infinity,
       decoration: BoxDecoration(
-        color: product.color != null
-            ? product.color?.withAlpha(80)
+        color: widget.product.color != null
+            ? widget.product.color?.withAlpha(80)
             : context.theme.surface,
         border: Border.all(color: context.theme.surface, width: 0),
         borderRadius: BorderRadius.circular(5.0),
@@ -61,28 +63,20 @@ class ProductGridItem extends StatelessWidget {
                             topLeft: Radius.circular(8.0),
                             topRight: Radius.circular(8.0),
                           ),
-                          child: product.media.isNotEmpty
+                          child: widget.product.media.isNotEmpty
                               ? Hero(
-                                  tag: 'product_${product.id}_image',
-                                  child: CachedNetworkImage(
+                                  tag: 'product_${widget.product.id}_image',
+                                  child: AppNetworkImage(
                                     imageUrl:
-                                        product.media[0].originalUrl ?? '',
+                                        widget.product.media[0].originalUrl ??
+                                            '',
                                     fit: BoxFit.cover,
-                                    errorWidget: (_, __, ___) => const Center(
+                                    errorWidget: const Center(
                                       child: AppIcon(
                                         AppIcons.icon,
                                         size: 30,
                                       ),
                                     ),
-                                    progressIndicatorBuilder:
-                                        (context, url, progress) {
-                                      return const Center(
-                                        child: AppIcon(
-                                          AppIcons.icon,
-                                          size: 30,
-                                        ),
-                                      );
-                                    },
                                   ),
                                 )
                               : Container(
@@ -101,11 +95,11 @@ class ProductGridItem extends StatelessWidget {
                       left: 6,
                       child: Row(
                         children: [
-                          if (product.isVip)
+                          if (widget.product.isVip)
                             const ProductBadge(type: ProductBadgeTypes.VIP),
-                          if (product.isTop)
+                          if (widget.product.isTop)
                             const ProductBadge(type: ProductBadgeTypes.TOP),
-                          if (product.isUrgent)
+                          if (widget.product.isUrgent)
                             const ProductBadge(type: ProductBadgeTypes.URGENT),
                         ],
                       ),
@@ -114,20 +108,16 @@ class ProductGridItem extends StatelessWidget {
                       top: 2,
                       right: 4,
                       child: IconButton(
-                        onPressed: () {
-                          if (product.isFavorite) {
-                            Get.find<ProductController>()
-                                .removeFromFavorites(product);
-                          } else {
-                            Get.find<ProductController>()
-                                .addToFavorites(product);
-                          }
+                        onPressed: () async {
+                          widget.onHeartTap?.call();
                         },
                         icon: Icon(
-                          product.isFavorite
+                          widget.product.isFavorite
                               ? Icons.favorite
                               : Icons.favorite_border,
-                          color: product.isFavorite ? Colors.red : Colors.white,
+                          color: widget.product.isFavorite
+                              ? Colors.red
+                              : Colors.white,
                         ),
                       ),
                     ),
@@ -142,7 +132,7 @@ class ProductGridItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product.getPrice,
+                        widget.product.getPrice,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -157,7 +147,7 @@ class ProductGridItem extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                product.title,
+                                widget.product.title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 12),
@@ -172,13 +162,13 @@ class ProductGridItem extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  Jiffy(product.createdAt)
+                                  Jiffy(widget.product.createdAt)
                                       .fromNow(), // '${product.getDate}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Get.theme.grey,
+                                    color: context.theme.grey,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -191,11 +181,11 @@ class ProductGridItem extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      product.views.toString(),
+                                      widget.product.views.toString(),
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 10,
-                                        color: Get.theme.grey,
+                                        color: context.theme.grey,
                                       ),
                                     ),
                                   ],
