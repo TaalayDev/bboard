@@ -1,3 +1,4 @@
+import 'package:bboard/res/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -55,6 +56,8 @@ class Routes {
 
                   return BlocProvider(
                     create: (context) => ProductFormCubit(
+                      productRepo: getIt.get(),
+                      settingsRepo: getIt.get(),
                       dataProvider: context.read<DataProvider>(),
                     ),
                     child: EditProductScreen(productId: id),
@@ -114,6 +117,8 @@ class Routes {
 
           return BlocProvider(
             create: (context) => ProductFormCubit(
+              productRepo: getIt.get(),
+              settingsRepo: getIt.get(),
               dataProvider: context.read<DataProvider>(),
             ),
             child: CreateProductScreen(category: category),

@@ -5,10 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../cubit/product/product_cubit.dart';
-import '../../../data/data_provider.dart';
 import '../../../cubit/user_details_cubit.dart';
-import '../../../res/routes.dart';
+import '../../../data/data_provider.dart';
 import '../../../data/models/user.dart';
+import '../../../res/globals.dart';
+import '../../../res/routes.dart';
 import '../../../res/theme.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/custom_app_bar.dart';
@@ -30,7 +31,9 @@ class UserProductsScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ProductCubit()..fetchUserProducts(userId),
+          create: (context) => ProductCubit(
+            productRepo: getIt.get(),
+          )..fetchUserProducts(userId),
         ),
         BlocProvider(create: (context) => UserDetailsCubit(userId, user: user)),
       ],

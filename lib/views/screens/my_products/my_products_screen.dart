@@ -1,3 +1,4 @@
+import 'package:bboard/res/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -43,7 +44,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProductCubit()..fetchCurrentUserProducts(),
+      create: (context) =>
+          ProductCubit(productRepo: getIt.get())..fetchCurrentUserProducts(),
       child: BlocBuilder<ProductCubit, ProductState>(
         builder: (context, state) {
           return Scaffold(

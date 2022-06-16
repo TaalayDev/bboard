@@ -1,10 +1,10 @@
 import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:bboard/res/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../cubit/auth_cubit.dart';
 import '../../../res/routes.dart';
@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthCubit(),
+      create: (context) => AuthCubit(userRepo: getIt.get()),
       child: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state.status == FormzStatus.submissionSuccess) {

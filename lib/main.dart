@@ -1,12 +1,12 @@
 import 'dart:io';
 
+import 'package:bboard/res/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event/event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'data/data_provider.dart';
@@ -15,6 +15,7 @@ import 'data/repositories/category_repo.dart';
 import 'data/repositories/product_repo.dart';
 import 'data/repositories/settings_repo.dart';
 import 'data/repositories/user_repo.dart';
+import 'helpers/network_helpers.dart';
 import 'helpers/sizer_utils.dart';
 import 'res/routes.dart';
 import 'bloc/user_bloc.dart';
@@ -45,14 +46,17 @@ void main() async {
 }
 
 void registerDependencies() {
-  final getIt = GetIt.instance;
-  final client = ApiClient.init();
+  final client = ApiClient(initDio());
 
   // repositories
-  getIt.registerLazySingleton(() => UserRepo(client: client));
-  getIt.registerLazySingleton(() => ProductRepo(client: client));
-  getIt.registerLazySingleton(() => CategoryRepo(client: client));
-  getIt.registerLazySingleton(() => SettingsRepo(client: client));
+  getIt.registerLazySingleton<IUserRepo>(() => UserRepo(client: client));
+  getIt.registerLazySingleton<IProductRepo>(() => ProductRepo(client: client));
+  getIt.registerLazySingleton<ICategoryRepo>(
+    () => CategoryRepo(client: client),
+  );
+  getIt.registerLazySingleton<ISettingsRepo>(
+    () => SettingsRepo(client: client),
+  );
 
   // events
   getIt.registerLazySingleton(() => Event<ProductEvent>());

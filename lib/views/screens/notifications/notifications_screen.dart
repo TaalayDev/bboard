@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 import '../../../cubit/notifications_cubit.dart';
+import '../../../res/globals.dart';
 import '../../../res/theme.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/custom_app_bar.dart';
@@ -13,7 +14,7 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notificationCubit = NotificationsCubit();
+    final notificationCubit = NotificationsCubit(settingsRepo: getIt.get());
 
     return Scaffold(
       appBar: const CustomAppBar(
@@ -25,7 +26,7 @@ class NotificationsScreen extends StatelessWidget {
         builder: (context, state) {
           return RefreshIndicator(
             onRefresh: () async {
-              await notificationCubit
+              notificationCubit
                 ..clearOffset()
                 ..fetchNotifications();
             },

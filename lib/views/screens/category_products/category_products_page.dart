@@ -1,3 +1,4 @@
+import 'package:bboard/res/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
@@ -26,6 +27,8 @@ class CategoryProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CategoryProductsCubit(
+        categoryRepo: getIt.get(),
+        productRepo: getIt.get(),
         dataProvider: context.read<DataProvider>(),
       )
         ..fetchCategoryDetails(categoryId)

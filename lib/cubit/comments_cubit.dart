@@ -1,17 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
-import '../data/models/category.dart';
 import '../data/models/comment.dart';
 import '../data/repositories/product_repo.dart';
-import '../data/storage.dart';
 part 'comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
-  CommentsCubit(int productId) : super(CommentsState(productId: productId));
+  CommentsCubit(int productId, {required IProductRepo productRepo})
+      : _productRepo = productRepo,
+        super(CommentsState(productId: productId));
 
-  final _productRepo = GetIt.I.get<ProductRepo>();
+  final IProductRepo _productRepo;
 
   void setReplyingComment(Comment? comment) {
     emit(state.copyWith(replyingTo: comment));

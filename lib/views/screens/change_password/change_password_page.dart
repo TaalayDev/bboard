@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:bboard/res/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
@@ -15,7 +16,7 @@ class ChangePasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changePasswordCubit = ChangePasswordCubit();
+    final changePasswordCubit = ChangePasswordCubit(userRepo: getIt.get());
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -39,7 +40,7 @@ class ChangePasswordScreen extends StatelessWidget {
         },
         listenWhen: (oldState, newState) => oldState.status != newState.status,
         child: BlocBuilder<ChangePasswordCubit, ChangePasswordState>(
-          bloc: changePasswordCubit,
+          bloc: ChangePasswordCubit(userRepo: getIt.get()),
           builder: (context, state) {
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 15),

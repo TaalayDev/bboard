@@ -1,5 +1,3 @@
-import 'package:get_it/get_it.dart';
-
 import '../../data/data_provider.dart';
 import '../../data/events/events.dart';
 import '../../data/models/category.dart';
@@ -13,15 +11,20 @@ part 'category_products_state.dart';
 
 class CategoryProductsCubit extends IProductCubit<CategoryProductsState>
     with ProdCubitMixin {
-  CategoryProductsCubit({DataProvider? dataProvider})
-      : _dataProvider = dataProvider,
+  CategoryProductsCubit({
+    required ICategoryRepo categoryRepo,
+    required IProductRepo productRepo,
+    DataProvider? dataProvider,
+  })  : _dataProvider = dataProvider,
+        _categoryRepo = categoryRepo,
+        _productRepo = productRepo,
         super(CategoryProductsState(category: dataProvider?.category.value)) {
     productEvents + productsListener;
   }
 
   DataProvider? _dataProvider;
-  final _categoryRepo = GetIt.I.get<CategoryRepo>();
-  final _productRepo = GetIt.I.get<ProductRepo>();
+  final ICategoryRepo _categoryRepo;
+  final IProductRepo _productRepo;
 
   void setSearchText(String text) {
     emit(state.copyWith(searchText: text));

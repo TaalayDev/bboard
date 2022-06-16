@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:formz/formz.dart';
-import 'package:get_it/get_it.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../data/repositories/user_repo.dart';
@@ -10,9 +9,11 @@ import '../data/repositories/user_repo.dart';
 part 'phone_verification_state.dart';
 
 class PhoneVerificationCubit extends Cubit<PhoneVerificationState> {
-  PhoneVerificationCubit() : super(const PhoneVerificationState());
+  PhoneVerificationCubit({required IUserRepo userRepo})
+      : _userRepo = userRepo,
+        super(const PhoneVerificationState());
 
-  final _userRepo = GetIt.I.get<UserRepo>();
+  final IUserRepo _userRepo;
 
   void setPhone(String? phone) {
     emit(state.copyWith(phone: phone));

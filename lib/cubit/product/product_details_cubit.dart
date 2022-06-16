@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../data/data_provider.dart';
 import '../../data/models/app_reponse.dart';
@@ -10,13 +9,17 @@ import '../../data/repositories/product_repo.dart';
 part 'product_details_state.dart';
 
 class ProductDetailsCubit extends Cubit<ProductDetailsState> {
-  ProductDetailsCubit(int productId, {DataProvider? dataProvider})
-      : super(ProductDetailsState(
+  ProductDetailsCubit(
+    int productId, {
+    required IProductRepo productRepo,
+    DataProvider? dataProvider,
+  })  : _productRepo = productRepo,
+        super(ProductDetailsState(
           productId: productId,
           product: dataProvider?.product.value,
         ));
 
-  final _productRepo = GetIt.I.get<ProductRepo>();
+  final IProductRepo _productRepo;
 
   Future<void> fetchProductDetails() async {
     emit(state.copyWith(isLoading: true));

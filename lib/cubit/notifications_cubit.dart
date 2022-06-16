@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
 import '../data/models/notification_model.dart';
 import '../data/repositories/settings_repo.dart';
@@ -8,9 +7,11 @@ import '../data/repositories/settings_repo.dart';
 part 'notifications_state.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
-  NotificationsCubit() : super(const NotificationsState());
+  NotificationsCubit({required ISettingsRepo settingsRepo})
+      : _settingRepo = settingsRepo,
+        super(const NotificationsState());
 
-  final _settingRepo = GetIt.I.get<SettingsRepo>();
+  final ISettingsRepo _settingRepo;
 
   void clearOffset() {
     emit(state.copyWith(

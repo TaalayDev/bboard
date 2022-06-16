@@ -8,6 +8,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../cubit/auth_cubit.dart';
 import '../../../cubit/phone_verification_cubit.dart';
+import '../../../res/globals.dart';
 import '../../../res/routes.dart';
 import '../../../res/theme.dart';
 import '../../widgets/app_button.dart';
@@ -21,7 +22,7 @@ class VerifyPhoneScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PhoneVerificationCubit(),
+      create: (context) => PhoneVerificationCubit(userRepo: getIt.get()),
       child: BlocListener<PhoneVerificationCubit, PhoneVerificationState>(
         listener: (context, state) {
           if (state.codeSent) {

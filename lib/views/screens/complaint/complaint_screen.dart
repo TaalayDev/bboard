@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:bboard/res/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +21,9 @@ class ComplaintScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final complaintCubit = ComplaintCubit(productId)..fetchComplaintTypes();
+    final complaintCubit = ComplaintCubit(productId, settingsRepo: getIt.get())
+      ..fetchComplaintTypes();
+
     return Scaffold(
       appBar: CustomAppBar(
         onBackPressed: () {

@@ -9,12 +9,15 @@ import '../data/repositories/category_repo.dart';
 part 'select_category_state.dart';
 
 class SelectCategoryCubit extends Cubit<SelectCategoryState> {
-  SelectCategoryCubit({DataProvider? dataProvider})
-      : _dataProvider = dataProvider,
+  SelectCategoryCubit({
+    required ICategoryRepo categoryRepo,
+    DataProvider? dataProvider,
+  })  : _categoryRepo = categoryRepo,
+        _dataProvider = dataProvider,
         super(const SelectCategoryState());
 
-  DataProvider? _dataProvider;
-  final _categoryRepo = GetIt.I.get<CategoryRepo>();
+  final DataProvider? _dataProvider;
+  final ICategoryRepo _categoryRepo;
 
   void selectCategory(Category category) {
     emit(state.copyWith(

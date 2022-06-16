@@ -1,15 +1,23 @@
-import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 
 import '../api_client.dart';
 import '../models/app_reponse.dart';
 import '../models/category.dart';
 
-class CategoryRepo {
+abstract class ICategoryRepo {
+  Future<AppResponse<List<Category>>> fetchCategoryTree({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse<Category>> fetchCategoryDetails(int id);
+}
+
+class CategoryRepo implements ICategoryRepo {
   const CategoryRepo({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
 
+  @override
   Future<AppResponse<List<Category>>> fetchCategoryTree({
     Map<String, dynamic>? params,
   }) async {
@@ -21,6 +29,7 @@ class CategoryRepo {
     );
   }
 
+  @override
   Future<AppResponse<Category>> fetchCategoryDetails(int id) async {
     return _client.getModel(
       'categories/$id',

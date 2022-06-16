@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:bboard/res/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,14 +13,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../cubit/product/product_details_cubit.dart';
 import '../../../data/constants.dart';
-import '../../../data/models/product.dart';
 import '../../../data/models/user.dart';
 import '../../../data/storage.dart';
 import '../../../helpers/helper_functions.dart';
 import '../../../views/widgets/app_button.dart';
 import '../../../data/data_provider.dart';
 import '../../../data/events/events.dart';
-import '../../../data/events/product_events.dart';
 import '../../../res/routes.dart';
 import '../../../res/theme.dart';
 import '../../widgets/app_carousel.dart';
@@ -50,6 +49,7 @@ class ProductDetailsScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProductDetailsCubit(
         productId,
+        productRepo: getIt.get(),
         dataProvider: context.read<DataProvider>(),
       )..fetchProductDetails(),
       child: BlocConsumer<ProductDetailsCubit, ProductDetailsState>(

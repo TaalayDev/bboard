@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
 import '../data/models/product.dart';
 import '../data/repositories/product_repo.dart';
@@ -8,9 +7,11 @@ import '../data/repositories/product_repo.dart';
 part 'favorites_state.dart';
 
 class FavoritesCubit extends Cubit<FavoritesState> {
-  FavoritesCubit() : super(const FavoritesState());
+  FavoritesCubit({required IProductRepo productRepo})
+      : _productRepo = productRepo,
+        super(const FavoritesState());
 
-  final _productRepo = GetIt.I.get<ProductRepo>();
+  final IProductRepo _productRepo;
 
   void fetchFavorites() async {
     final response = await _productRepo.fetchFavorites();

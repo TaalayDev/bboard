@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
-import '../data/data_provider.dart';
 import '../data/models/category.dart';
 import '../data/models/filter.dart';
 import '../data/models/region.dart';
@@ -12,13 +10,16 @@ import '../data/repositories/settings_repo.dart';
 part 'filter_state.dart';
 
 class FilterCubit extends Cubit<FilterState> {
-  FilterCubit({Filter? filter})
-      : super(FilterState(
-          filter: filter,
-        ));
+  FilterCubit({
+    required ISettingsRepo settingsRepo,
+    required IProductRepo productRepo,
+    Filter? filter,
+  })  : _settingRepo = settingsRepo,
+        _productRepo = productRepo,
+        super(FilterState(filter: filter));
 
-  final _settingRepo = GetIt.I<SettingsRepo>();
-  final _productRepo = GetIt.I<ProductRepo>();
+  final ISettingsRepo _settingRepo;
+  final IProductRepo _productRepo;
 
   void addToFilter({
     int? categoryId,

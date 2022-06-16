@@ -4,8 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:path/path.dart';
-import 'package:get_it/get_it.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../data/models/product.dart';
 import '../../data/data_provider.dart';
@@ -20,14 +18,19 @@ import '../../helpers/image_picker.dart';
 part 'product_form_state.dart';
 
 class ProductFormCubit extends Cubit<ProductFormState> {
-  ProductFormCubit({DataProvider? dataProvider})
-      : super(ProductFormState(
+  ProductFormCubit({
+    required IProductRepo productRepo,
+    required ISettingsRepo settingsRepo,
+    DataProvider? dataProvider,
+  })  : _productRepo = productRepo,
+        _settingsRepo = settingsRepo,
+        super(ProductFormState(
           category: dataProvider?.category.value,
           product: dataProvider?.product.value,
         ));
 
-  final _productRepo = GetIt.I.get<ProductRepo>();
-  final _settingsRepo = GetIt.I.get<SettingsRepo>();
+  final IProductRepo _productRepo;
+  final ISettingsRepo _settingsRepo;
 
   void setCategory(Category? category) {
     emit(state.copyWith(category: category));

@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 import '../api_client.dart';
 import '../models/app_reponse.dart';
 import '../models/complaint.dart';
@@ -8,11 +6,28 @@ import '../models/currency.dart';
 import '../models/notification_model.dart';
 import '../models/region.dart';
 
-class SettingsRepo {
+abstract class ISettingsRepo {
+  Future<AppResponse<List<Currency>>> fetchCurrencies();
+
+  Future<AppResponse<List<Region>>> fetchRegions();
+
+  Future<AppResponse<List<NotificationModel>>> fetchNotifications({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse<List<ComplaintType>>> fetchComplaintTypes({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse<Complaint>> sendComplaint(Complaint complaint);
+}
+
+class SettingsRepo implements ISettingsRepo {
   const SettingsRepo({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
 
+  @override
   Future<AppResponse<List<Currency>>> fetchCurrencies() async {
     return _client.getModel(
       'currencies',
@@ -20,6 +35,7 @@ class SettingsRepo {
     );
   }
 
+  @override
   Future<AppResponse<List<Region>>> fetchRegions() async {
     return _client.getModel(
       'regions',
@@ -28,6 +44,7 @@ class SettingsRepo {
     );
   }
 
+  @override
   Future<AppResponse<List<NotificationModel>>> fetchNotifications({
     Map<String, dynamic>? params,
   }) async {
@@ -40,6 +57,7 @@ class SettingsRepo {
     );
   }
 
+  @override
   Future<AppResponse<List<ComplaintType>>> fetchComplaintTypes({
     Map<String, dynamic>? params,
   }) async {
@@ -50,6 +68,7 @@ class SettingsRepo {
     );
   }
 
+  @override
   Future<AppResponse<Complaint>> sendComplaint(Complaint complaint) async {
     return _client.postModel(
       'complaints',

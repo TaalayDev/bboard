@@ -6,11 +6,54 @@ import '../models/comment.dart';
 import '../models/product.dart';
 import '../storage.dart';
 
-class ProductRepo {
+abstract class IProductRepo {
+  Future<AppResponse<List<Product>>> fetchProducts({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse<List<Product>>> fetchFavorites({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse<Product>> fetchProduct(
+    int id, {
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse> deleteProduct(int id);
+
+  Future<AppResponse<List<Product>>> fetchUserProducts({
+    Map<String, dynamic>? params,
+  });
+
+  Future<AppResponse> addToFavorites(int productId);
+
+  Future<AppResponse> removeFromFavorites(int productId);
+
+  Future<AppResponse<Product>> createProduct(Map<String, dynamic>? data);
+
+  Future<AppResponse<Product>> updateProduct(
+    int id,
+    Map<String, dynamic> data,
+  );
+
+  Future<AppResponse<List<Comment>>> fetchProductComments(int productId);
+
+  Future<AppResponse<Comment>> createComment({
+    required String text,
+    required int productId,
+    int? parentId,
+  });
+
+  Future<AppResponse<Comment>> removeComment(int commentId);
+}
+
+class ProductRepo implements IProductRepo {
   const ProductRepo({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
 
+  @override
   Future<AppResponse<List<Product>>> fetchProducts({
     Map<String, dynamic>? params,
   }) {
@@ -21,6 +64,7 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse<List<Product>>> fetchFavorites({
     Map<String, dynamic>? params,
   }) async {
@@ -31,6 +75,7 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse<Product>> fetchProduct(
     int id, {
     Map<String, dynamic>? params,
@@ -47,10 +92,12 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse> deleteProduct(int id) async {
     return _client.deleteModel('products/$id');
   }
 
+  @override
   Future<AppResponse<List<Product>>> fetchUserProducts({
     Map<String, dynamic>? params,
   }) async {
@@ -61,14 +108,17 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse> addToFavorites(int productId) async {
     return _client.postModel('products/$productId/addtofav');
   }
 
+  @override
   Future<AppResponse> removeFromFavorites(int productId) async {
     return _client.postModel('products/$productId/remfromfav');
   }
 
+  @override
   Future<AppResponse<Product>> createProduct(Map<String, dynamic>? data) async {
     return _client.postModel<Product>(
       'products',
@@ -77,6 +127,7 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse<Product>> updateProduct(
     int id,
     Map<String, dynamic> data,
@@ -88,6 +139,7 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse<List<Comment>>> fetchProductComments(int productId) async {
     final params = {
       'search': 'advertisement_id:$productId',
@@ -103,6 +155,7 @@ class ProductRepo {
     );
   }
 
+  @override
   Future<AppResponse<Comment>> createComment({
     required String text,
     required int productId,
@@ -116,6 +169,7 @@ class ProductRepo {
     });
   }
 
+  @override
   Future<AppResponse<Comment>> removeComment(int commentId) async {
     return _client.deleteModel('comments/$commentId');
   }

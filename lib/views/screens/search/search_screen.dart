@@ -9,6 +9,7 @@ import '../../../data/models/filter.dart';
 import '../../../data/models/key_value.dart';
 import '../../../data/models/region.dart';
 import '../../../helpers/helper_functions.dart';
+import '../../../res/globals.dart';
 import '../../../res/theme.dart';
 import '../../widgets/custom_card.dart';
 import '../../widgets/custom_select.dart';
@@ -33,7 +34,11 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FilterCubit(filter: filter)..fetchRegions(),
+      create: (context) => FilterCubit(
+        filter: filter,
+        settingsRepo: getIt.get(),
+        productRepo: getIt.get(),
+      )..fetchRegions(),
       child: BlocBuilder<FilterCubit, FilterState>(
         builder: (context, state) {
           final filterCubit = context.read<FilterCubit>();

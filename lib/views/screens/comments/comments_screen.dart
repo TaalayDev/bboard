@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:bboard/res/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,10 +29,9 @@ class CommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final commentsCubit = CommentsCubit(productId)..fetchProductComments();
-
     return BlocBuilder<CommentsCubit, CommentsState>(
-      bloc: commentsCubit,
+      bloc: CommentsCubit(productId, productRepo: getIt.get())
+        ..fetchProductComments(),
       builder: (context, state) {
         return Scaffold(
           appBar: const CustomAppBar(
@@ -56,7 +56,9 @@ class CommentsScreen extends StatelessWidget {
                                   .where((element) => element.parentId == null)
                                   .toList(),
                               onReply: (comment) {
-                                commentsCubit.setReplyingComment(comment);
+                                context
+                                    .read<CommentsCubit>()
+                                    .setReplyingComment(comment);
                               },
                               onRemove: (comment) {
                                 defaultDialog(
@@ -71,7 +73,8 @@ class CommentsScreen extends StatelessWidget {
                                     onPressed: () async {
                                       context.pop();
                                       final loader = showLoader(context);
-                                      final result = await commentsCubit
+                                      final result = await context
+                                          .read<CommentsCubit>()
                                           .removeComment(comment.id);
                                       if (!result) {
                                         FlushbarHelper.createInformation(
@@ -111,7 +114,9 @@ class CommentsScreen extends StatelessWidget {
                                   if (event.logicalKey ==
                                           LogicalKeyboardKey.backspace &&
                                       _commentTextCont.text.isEmpty) {
-                                    commentsCubit.setReplyingComment(null);
+                                    context
+                                        .read<CommentsCubit>()
+                                        .setReplyingComment(null);
                                   }
                                 },
                                 child: TextField(
@@ -161,14 +166,17 @@ class CommentsScreen extends StatelessWidget {
                                           if (_commentTextCont
                                               .text.isNotEmpty) {
                                             final loader = showLoader(context);
-                                            await commentsCubit.createComment(
-                                                _commentTextCont.text);
+                                            await context
+                                                .read<CommentsCubit>()
+                                                .createComment(
+                                                    _commentTextCont.text);
                                             loader.remove();
 
                                             _commentTextCont.clear();
                                             _commentFocus.unfocus();
                                             if (state.replyingTo != null) {
-                                              commentsCubit
+                                              context
+                                                  .read<CommentsCubit>()
                                                   .setReplyingComment(null);
                                             } else {
                                               await _commentsScrollController

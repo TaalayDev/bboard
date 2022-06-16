@@ -1,3 +1,4 @@
+import 'package:bboard/res/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,7 +17,8 @@ class SelectCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SelectCategoryCubit()..fetchCategoryTree(),
+      create: (context) =>
+          SelectCategoryCubit(categoryRepo: getIt.get())..fetchCategoryTree(),
       child: BlocBuilder<SelectCategoryCubit, SelectCategoryState>(
         builder: (context, state) {
           return WillPopScope(

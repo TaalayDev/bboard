@@ -8,6 +8,7 @@ import '../../../cubit/product/product_cubit.dart';
 import '../../../data/data_provider.dart';
 import '../../../data/events/events.dart';
 import '../../../data/events/product_events.dart';
+import '../../../res/globals.dart';
 import '../../../res/routes.dart';
 import '../../../res/theme.dart';
 
@@ -21,7 +22,8 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProductCubit()..fetchFavorites(),
+      create: (context) =>
+          ProductCubit(productRepo: getIt.get())..fetchFavorites(),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -38,7 +40,6 @@ class FavoritesScreen extends StatelessWidget {
           event: favoriteEvents,
           rebuildOnEvent: false,
           onEvent: (context, event) {
-            print('favorites event ${event?.favorite}');
             if (event != null) {
               if (event.favorite) {
                 context

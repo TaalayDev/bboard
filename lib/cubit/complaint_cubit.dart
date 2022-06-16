@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
 import '../data/models/complaint.dart';
 import '../data/models/complaint_type.dart';
@@ -10,9 +9,11 @@ import '../data/storage.dart';
 part 'complaint_state.dart';
 
 class ComplaintCubit extends Cubit<ComplaintState> {
-  ComplaintCubit(int productId) : super(ComplaintState(productId: productId));
+  ComplaintCubit(int productId, {required ISettingsRepo settingsRepo})
+      : _settingsRepo = settingsRepo,
+        super(ComplaintState(productId: productId));
 
-  final _settingsRepo = GetIt.I.get<SettingsRepo>();
+  final ISettingsRepo _settingsRepo;
 
   void setComplaintType(ComplaintType type) {
     emit(state.copyWith(selectedType: type));

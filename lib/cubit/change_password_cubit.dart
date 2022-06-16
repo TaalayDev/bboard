@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:get_it/get_it.dart';
 
 import '../data/repositories/user_repo.dart';
 import '../helpers/form_inputs.dart';
@@ -9,9 +8,12 @@ import '../helpers/form_inputs.dart';
 part 'change_password_state.dart';
 
 class ChangePasswordCubit extends Cubit<ChangePasswordState> {
-  ChangePasswordCubit() : super(const ChangePasswordState());
+  ChangePasswordCubit({
+    required IUserRepo userRepo,
+  })  : _userRepo = userRepo,
+        super(const ChangePasswordState());
 
-  final _userRepo = GetIt.I.get<UserRepo>();
+  final IUserRepo _userRepo;
 
   void setPassword(String value) {
     final password = Password.dirty(value);

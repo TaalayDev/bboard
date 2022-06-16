@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/data_provider.dart';
+import '../../../res/globals.dart';
 import '../../widgets/animated_list_item.dart';
 import '../search/search_screen.dart';
 
@@ -23,8 +24,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ProductCubit()..fetchProducts()),
-        BlocProvider(create: (context) => CategoryCubit()..fetchCategories()),
+        BlocProvider(
+          create: (context) => ProductCubit(
+            productRepo: getIt.get(),
+          )..fetchProducts(),
+        ),
+        BlocProvider(
+          create: (context) => CategoryCubit(
+            categoryRepo: getIt.get(),
+          )..fetchCategories(),
+        ),
       ],
       child: Builder(builder: (context) {
         return Scaffold(

@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../data/events/events.dart';
 import '../../data/events/product_events.dart';
@@ -16,11 +15,13 @@ abstract class IProductCubit<T extends IProductState> extends Cubit<T> {
 }
 
 class ProductCubit extends IProductCubit<ProductState> with ProdCubitMixin {
-  ProductCubit() : super(const ProductState()) {
+  ProductCubit({required IProductRepo productRepo})
+      : _productRepo = productRepo,
+        super(const ProductState()) {
     productEvents + productsListener;
   }
 
-  final _productRepo = GetIt.I.get<ProductRepo>();
+  final IProductRepo _productRepo;
 
   void fetchFavorites() async {
     emit(state.copyWith(isLoading: true));

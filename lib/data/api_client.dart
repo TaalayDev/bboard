@@ -1,42 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:bboard/helpers/network_helpers.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 
-import 'interceptors/auth_interceptor.dart';
 import 'storage.dart';
-import 'constants.dart';
 import 'models/app_reponse.dart';
 
 class ApiClient {
-  final _dio = Dio(BaseOptions(baseUrl: Constants.apiBaseUrl));
-  final _options = CacheOptions(
-    store: MemCacheStore(),
-    policy: CachePolicy.refresh,
-    hitCacheOnErrorExcept: [401, 403],
-    maxStale: const Duration(days: 7),
-    priority: CachePriority.normal,
-    cipher: null,
-    keyBuilder: CacheOptions.defaultCacheKeyBuilder,
-    allowPostMethod: false,
-  );
+  ApiClient(this._dio);
 
-  ApiClient.init() {
-    _dio.interceptors.add(AuthInterceptor());
-    _dio.interceptors.add(DioCacheInterceptor(
-      options: CacheOptions(
-        store: MemCacheStore(),
-        policy: CachePolicy.refresh,
-        hitCacheOnErrorExcept: [401, 403],
-        maxStale: const Duration(days: 7),
-        priority: CachePriority.high,
-        cipher: null,
-        keyBuilder: CacheOptions.defaultCacheKeyBuilder,
-        allowPostMethod: false,
-      ),
-    ));
-  }
+  final Dio _dio;
 
   Future<Response<T>> get<T>(
     String url, {
@@ -138,7 +112,7 @@ class ApiClient {
         url,
         queryParameters: params,
         data: data,
-        options: _options.copyWith(policy: policy).toOptions(),
+        options: kCacheOptions.copyWith(policy: policy).toOptions(),
       );
       model.statusCode = response.statusCode;
       if (response.data is Map && response.data['data'] != null) {

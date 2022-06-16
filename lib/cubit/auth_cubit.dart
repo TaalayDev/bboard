@@ -1,10 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:formz/formz.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:oktoast/oktoast.dart';
 
 import '../data/repositories/user_repo.dart';
 import '../data/models/register_model.dart';
@@ -14,9 +11,12 @@ import '../helpers/form_inputs.dart';
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(const AuthState());
+  AuthCubit({
+    required IUserRepo userRepo,
+  })  : _userRepo = userRepo,
+        super(const AuthState());
 
-  final _userRepo = GetIt.I.get<UserRepo>();
+  final IUserRepo _userRepo;
 
   void loginChanged(String value) {
     final login = Login.dirty(value);
