@@ -75,7 +75,10 @@ class App extends StatelessWidget {
         child: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (_) => UserBloc(isLogin: LocaleStorage.isLogin),
+              create: (_) => UserBloc(
+                isLogin: LocaleStorage.isLogin,
+                userRepo: getIt.get(),
+              ),
             ),
           ],
           child: LayoutBuilder(builder: (context, constraints) {

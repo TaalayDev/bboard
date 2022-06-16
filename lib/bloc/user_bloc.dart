@@ -16,7 +16,9 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  UserBloc({bool isLogin = false}) : super(UserState(isLogin: isLogin)) {
+  UserBloc({bool isLogin = false, required IUserRepo userRepo})
+      : _userRepo = userRepo,
+        super(UserState(isLogin: isLogin)) {
     on<LoginEvent>(_loginHandler);
     on<FetchUserEvent>(_fetchCurrentUserDetails);
     on<FetchProductsCountEvent>(_fetchProductsCount);
@@ -31,7 +33,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     }
   }
 
-  final _userRepo = GetIt.I<UserRepo>();
+  final IUserRepo _userRepo;
 
   void _loginHandler(LoginEvent event, Emitter<UserState> emit) {
     emit(state.copyWith(isLogin: true));
