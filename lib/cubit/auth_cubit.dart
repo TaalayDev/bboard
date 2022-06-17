@@ -106,8 +106,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       // Trigger the Google Authentication flow.
       final account = await GoogleSignIn(
-        clientId: '74950354939-6mo9fu96i0p3co1m9ki2i0oeh4qdbcoh'
-            '.apps.googleusercontent.com',
+        clientId: '',
       ).signIn();
       if (account != null) {
         /*
