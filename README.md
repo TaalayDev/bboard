@@ -1,4 +1,4 @@
-# bboard
+# bulletin-board
 
 A new Flutter application.
 
